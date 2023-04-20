@@ -9,4 +9,6 @@ public interface IProfileService
     Task<ProfileResponse> GetUserProfile(string userEmail);
 
     Task DeleteUserProfile(string userEmail);
+    
+    Task ChangeUserPassword(PasswordChange passwords, string userEmail);
 }

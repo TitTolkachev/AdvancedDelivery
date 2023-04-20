@@ -38,7 +38,7 @@ public class ProfileController : ControllerBase
 
         return Ok();
     }
-
+    
     [Authorize]
     [HttpDelete]
     public async Task<ActionResult> DeleteProfile()
@@ -48,6 +48,19 @@ public class ProfileController : ControllerBase
         var userEmail = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
         if (userEmail == null) return Unauthorized("Unauthorized");
         await _profileService.DeleteUserProfile(userEmail);
+
+        return Ok();
+    }
+    
+    [Authorize]
+    [HttpPut]
+    [Route("password")]
+    public async Task<ActionResult> ChangeUserPassword([FromBody] PasswordChange passwords)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        var userEmail = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
+        if (userEmail == null) return Unauthorized("Unauthorized");
+        await _profileService.ChangeUserPassword(passwords, userEmail);
 
         return Ok();
     }

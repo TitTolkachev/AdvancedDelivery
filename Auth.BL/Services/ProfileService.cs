@@ -55,12 +55,8 @@ public class ProfileService : IProfileService
         }
 
         user.FullName = request.FullName;
-        user.BirthDate = request.BirthDate;
-        user.Gender = request.Gender;
         user.PhoneNumber = request.Phone;
         user.Address = request.Address;
-        user.Email = request.Email;
-        user.UserName = request.Email;
 
         var result = await _userManager.UpdateAsync(user);
 
@@ -88,5 +84,30 @@ public class ProfileService : IProfileService
         }
 
         await _userManager.DeleteAsync(findUser);
+    }
+
+    public async Task ChangeUserPassword(PasswordChange passwords, string userEmail)
+    {
+        var user = await _userManager.FindByEmailAsync(userEmail);
+
+        if (user == null)
+        {
+            var exc = new Exception();
+            exc.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+                $"User with Email {userEmail} not found"
+            );
+            throw exc;
+        }
+
+        var result = await _userManager.ChangePasswordAsync(user, passwords.CurrentPassword, passwords.NewPassword);
+
+        if (result.Errors.Any())
+        {
+            var exc = new Exception();
+            exc.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+                result.Errors.First().Description
+            );
+            throw exc;
+        }
     }
 }

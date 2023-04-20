@@ -72,7 +72,7 @@ public class AuthService : IAuthService
 
         return new AuthResponse
         {
-            Username = user.UserName!,
+            Username = user.FullName,
             Email = user.Email!,
             Token = accessToken,
             RefreshToken = user.RefreshToken
