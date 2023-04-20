@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Auth.Api.Controllers;
 
 [ApiController]
-[Route("profile")]
+[Route("api/profile")]
 public class ProfileController : ControllerBase
 {
     private readonly IProfileService _profileService;

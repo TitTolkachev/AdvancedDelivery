@@ -23,10 +23,11 @@ builder.Services.AddSwaggerGen(c =>
     c.EnableAnnotations();
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Delivery.Api",
+        Title = "Backend.Api",
         Version = "v1",
-        Description = "The API for my application"
+        Description = "Backend API"
     });
+    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 });
 
 // DB
@@ -40,7 +41,6 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddMvc();
 
 // Services
-builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IBasketService, BasketService>();
 builder.Services.AddScoped<IOrderService, OrderService>();

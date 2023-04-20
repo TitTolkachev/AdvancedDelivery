@@ -54,4 +54,14 @@ public class OrderController : ControllerBase
     {
         await _orderService.ConfirmOrderDelivery(Guid.Parse(User.Identity.Name), id);
     }
+    
+    [HttpPost]
+    [Authorize]
+    [Authorize(Policy = "ValidateToken")]
+    [Route("{id}/status")]
+    [SwaggerOperation(Summary = "Cancel order")]
+    public async Task CancelOrder(Guid id)
+    {
+        // TODO(Не сделано)
+    }
 }
