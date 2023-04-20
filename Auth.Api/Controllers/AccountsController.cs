@@ -34,7 +34,7 @@ public class AccountsController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> RefreshToken(Token? tokenModel)
+    public async Task<ActionResult<Token>> RefreshToken(Token? tokenModel)
     {
         if (tokenModel is null) return BadRequest("Invalid client request");
         return Ok(await _authService.RefreshToken(tokenModel));
@@ -42,7 +42,7 @@ public class AccountsController : ControllerBase
 
     [Authorize]
     [HttpPost("revoke")]
-    public async Task<IActionResult> Revoke()
+    public async Task<ActionResult> Revoke()
     {
         var userEmail = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
         if (userEmail == null) return BadRequest("Invalid user name");

@@ -19,7 +19,7 @@ public class ProfileController : ControllerBase
 
     [Authorize]
     [HttpGet]
-    public async Task<ActionResult<AuthResponse>> GetUserProfile()
+    public async Task<ActionResult<ProfileResponse>> GetUserProfile()
     {
         var userEmail = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
         if (userEmail == null) return BadRequest("Invalid user name");
@@ -28,13 +28,27 @@ public class ProfileController : ControllerBase
 
     [Authorize]
     [HttpPut]
-    public async Task<ActionResult<AuthResponse>> ChangeUserProfile([FromBody] RegisterRequest request)
+    public async Task<ActionResult> ChangeUserProfile([FromBody] ProfileRequest request)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         var userEmail = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
-        if (userEmail == null) return BadRequest("Invalid user name");
-        
-        return Ok(await _profileService.ChangeUserProfile(userEmail));
+        if (userEmail == null) return Unauthorized("Unauthorized");
+        await _profileService.ChangeUserProfile(request, userEmail);
+
+        return Ok();
+    }
+
+    [Authorize]
+    [HttpDelete]
+    public async Task<ActionResult> DeleteProfile()
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var userEmail = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
+        if (userEmail == null) return Unauthorized("Unauthorized");
+        await _profileService.DeleteUserProfile(userEmail);
+
+        return Ok();
     }
 }

@@ -1,12 +1,10 @@
 ﻿using Auth.Common.Dto;
-using Auth.Common.Extensions;
 using Auth.Common.Interfaces;
 using Auth.DAL;
 using Auth.DAL.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Auth.BL.Services;
 
@@ -14,104 +12,81 @@ public class ProfileService : IProfileService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly AppDbContext _context;
-    private readonly IConfiguration _configuration;
-    private readonly ITokenService _tokenService;
 
-    public ProfileService(ITokenService tokenService, AppDbContext context, UserManager<ApplicationUser> userManager,
-        IConfiguration configuration)
+    public ProfileService(AppDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
         _userManager = userManager;
-        _configuration = configuration;
-        _tokenService = tokenService;
     }
 
-    public async Task<AuthResponse> GetUserProfile()
+    public async Task<ProfileResponse> GetUserProfile(string userEmail)
     {
-        var managedUser = await _userManager.FindByEmailAsync(request.Email);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
 
-        if (managedUser == null)
-        {
-            var ex = new Exception();
-            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
-                "Bad credentials"
-            );
-            throw ex;
-        }
+        if (user is not null)
+            return new ProfileResponse
+            {
+                FullName = user.Address,
+                Address = user.Address,
+                BirthDate = user.BirthDate,
+                Email = user.Email,
+                Gender = user.Gender,
+                Phone = user.PhoneNumber
+            };
 
-        var isPasswordValid = await _userManager.CheckPasswordAsync(managedUser, request.Password);
-
-        if (!isPasswordValid)
-        {
-            var ex = new Exception();
-            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
-                "Bad credentials"
-            );
-            throw ex;
-        }
-
-        var user = _context.Users.FirstOrDefault(u => u.Email == request.Email);
-
-        if (user is null)
-        {
-            var ex = new Exception();
-            ex.Data.Add(StatusCodes.Status401Unauthorized.ToString(), "Unauthorized");
-            throw ex;
-        }
-
-        var roleIds = await _context.UserRoles.Where(r => r.UserId == user.Id).Select(x => x.RoleId).ToListAsync();
-        var roles = _context.Roles.Where(x => roleIds.Contains(x.Id)).ToList();
-
-        var accessToken = _tokenService.CreateToken(user, roles);
-        user.RefreshToken = _configuration.GenerateRefreshToken();
-        user.RefreshTokenExpiryTime =
-            DateTime.UtcNow.AddDays(_configuration.GetSection("Jwt:RefreshTokenValidityInDays").Get<int>());
-
-        await _context.SaveChangesAsync();
-
-        return new AuthResponse
-        {
-            Username = user.UserName!,
-            Email = user.Email!,
-            Token = accessToken,
-            RefreshToken = user.RefreshToken
-        };
+        var ex = new Exception();
+        ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+            "User not found"
+        );
+        throw ex;
     }
 
-    public async Task<AuthResponse> ChangeUserProfile(RegisterRequest request)
+    public async Task ChangeUserProfile(ProfileRequest request, string userEmail)
     {
-        var user = new ApplicationUser
-        {
-            FullName = request.FullName,
-            BirthDate = request.BirthDate,
-            Gender = request.Gender,
-            PhoneNumber = request.Phone,
-            Address = request.Address,
-            Email = request.Email,
-            UserName = request.Email
-        };
+        var user = await _userManager.FindByEmailAsync(userEmail);
 
-        var result = await _userManager.CreateAsync(user, request.Password);
-        if (result.Errors.Any())
+        if (user == null)
         {
             var exc = new Exception();
             exc.Data.Add(StatusCodes.Status400BadRequest.ToString(),
-                "Bad credentials"
+                $"User with Email {userEmail} not found"
             );
             throw exc;
         }
 
-        var findUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
+        user.FullName = request.FullName;
+        user.BirthDate = request.BirthDate;
+        user.Gender = request.Gender;
+        user.PhoneNumber = request.Phone;
+        user.Address = request.Address;
+        user.Email = request.Email;
+        user.UserName = request.Email;
 
-        if (findUser == null) throw new Exception($"User {request.Email} not found");
+        var result = await _userManager.UpdateAsync(user);
 
-        // По умолчанию роль Customer
-        await _userManager.AddToRoleAsync(findUser, Roles.Customer);
-
-        return await Login(new AuthRequest
+        if (result.Errors.Any())
         {
-            Email = request.Email,
-            Password = request.Password
-        });
+            var exc = new Exception();
+            exc.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+                result.Errors.First().Description
+            );
+            throw exc;
+        }
+    }
+
+    public async Task DeleteUserProfile(string userEmail)
+    {
+        var findUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
+
+        if (findUser == null)
+        {
+            var exc = new Exception();
+            exc.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+                $"User with Email {userEmail} not found"
+            );
+            throw exc;
+        }
+
+        await _userManager.DeleteAsync(findUser);
     }
 }
