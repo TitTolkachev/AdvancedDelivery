@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DeliveryBackend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221201202105_Initial")]
+    [Migration("20230420073943_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -20,12 +20,12 @@ namespace DeliveryBackend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.0")
+                .HasAnnotation("ProductVersion", "8.0.0-preview.3.23174.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Backend.Api.Data.Models.Entities.Cart", b =>
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.Cart", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,7 +38,6 @@ namespace DeliveryBackend.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("OrderId")
-                        .IsRequired()
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")
@@ -56,14 +55,15 @@ namespace DeliveryBackend.Migrations
                     b.ToTable("Carts");
                 });
 
-            modelBuilder.Entity("Backend.Api.Data.Models.Entities.Dish", b =>
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.Dish", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Category")
-                        .HasColumnType("integer");
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -80,6 +80,9 @@ namespace DeliveryBackend.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("double precision");
 
+                    b.Property<double?>("Rating")
+                        .HasColumnType("double precision");
+
                     b.Property<bool>("Vegetarian")
                         .HasColumnType("boolean");
 
@@ -88,7 +91,7 @@ namespace DeliveryBackend.Migrations
                     b.ToTable("Dishes");
                 });
 
-            modelBuilder.Entity("Backend.Api.Data.Models.Entities.Order", b =>
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -107,8 +110,9 @@ namespace DeliveryBackend.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -120,7 +124,7 @@ namespace DeliveryBackend.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Backend.Api.Data.Models.Entities.Rating", b =>
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.Rating", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -145,7 +149,20 @@ namespace DeliveryBackend.Migrations
                     b.ToTable("Ratings");
                 });
 
-            modelBuilder.Entity("Backend.Api.Data.Models.Entities.User", b =>
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.Token", b =>
+                {
+                    b.Property<string>("InvalidToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ExpiredDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("InvalidToken");
+
+                    b.ToTable("Tokens");
+                });
+
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -165,8 +182,9 @@ namespace DeliveryBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Gender")
-                        .HasColumnType("integer");
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -180,21 +198,19 @@ namespace DeliveryBackend.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Backend.Api.Data.Models.Entities.Cart", b =>
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.Cart", b =>
                 {
-                    b.HasOne("Backend.Api.Data.Models.Entities.Dish", "Dish")
+                    b.HasOne("DeliveryBackend.Data.Models.Entities.Dish", "Dish")
                         .WithMany("Carts")
                         .HasForeignKey("DishId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Api.Data.Models.Entities.Order", "Order")
+                    b.HasOne("DeliveryBackend.Data.Models.Entities.Order", "Order")
                         .WithMany("Carts")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OrderId");
 
-                    b.HasOne("Backend.Api.Data.Models.Entities.User", "User")
+                    b.HasOne("DeliveryBackend.Data.Models.Entities.User", "User")
                         .WithMany("Carts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -207,9 +223,9 @@ namespace DeliveryBackend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Backend.Api.Data.Models.Entities.Order", b =>
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.Order", b =>
                 {
-                    b.HasOne("Backend.Api.Data.Models.Entities.User", "User")
+                    b.HasOne("DeliveryBackend.Data.Models.Entities.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -218,15 +234,15 @@ namespace DeliveryBackend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Backend.Api.Data.Models.Entities.Rating", b =>
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.Rating", b =>
                 {
-                    b.HasOne("Backend.Api.Data.Models.Entities.Dish", "Dish")
+                    b.HasOne("DeliveryBackend.Data.Models.Entities.Dish", "Dish")
                         .WithMany("Ratings")
                         .HasForeignKey("DishId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Api.Data.Models.Entities.User", "User")
+                    b.HasOne("DeliveryBackend.Data.Models.Entities.User", "User")
                         .WithMany("Ratings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -237,19 +253,19 @@ namespace DeliveryBackend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Backend.Api.Data.Models.Entities.Dish", b =>
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.Dish", b =>
                 {
                     b.Navigation("Carts");
 
                     b.Navigation("Ratings");
                 });
 
-            modelBuilder.Entity("Backend.Api.Data.Models.Entities.Order", b =>
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.Order", b =>
                 {
                     b.Navigation("Carts");
                 });
 
-            modelBuilder.Entity("Backend.Api.Data.Models.Entities.User", b =>
+            modelBuilder.Entity("DeliveryBackend.Data.Models.Entities.User", b =>
                 {
                     b.Navigation("Carts");
 

@@ -155,7 +155,7 @@ public class AccountsController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    [Route("revoke/{username}")]
+    [Route("revoke")]
     public async Task<IActionResult> Revoke()
     {
         var userEmail = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
@@ -163,6 +163,7 @@ public class AccountsController : ControllerBase
         if (user == null) return BadRequest("Invalid user name");
 
         user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = null;
         await _userManager.UpdateAsync(user);
 
         return Ok();
