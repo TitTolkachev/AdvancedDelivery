@@ -1,79 +1,28 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Auth.BL.Services;
+﻿using System.Security.Claims;
 using Auth.Common.Dto;
-using Auth.Common.Extensions;
-using Auth.DAL;
-using Auth.DAL.Entities;
+using Auth.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Api.Controllers;
 
 [ApiController]
-[Route("accounts")]
+[Route("auth")]
 public class AccountsController : ControllerBase
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly AppDbContext _context;
-    private readonly ITokenService _tokenService;
-    private readonly IConfiguration _configuration;
+    private readonly IAuthService _authService;
 
-    public AccountsController(ITokenService tokenService, AppDbContext context,
-        UserManager<ApplicationUser> userManager, IConfiguration configuration)
+    public AccountsController(IAuthService authService)
     {
-        _tokenService = tokenService;
-        _context = context;
-        _userManager = userManager;
-        _configuration = configuration;
+        _authService = authService;
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Authenticate([FromBody] AuthRequest request)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
+        if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var managedUser = await _userManager.FindByEmailAsync(request.Email);
-
-        if (managedUser == null)
-        {
-            return BadRequest("Bad credentials");
-        }
-
-        var isPasswordValid = await _userManager.CheckPasswordAsync(managedUser, request.Password);
-
-        if (!isPasswordValid)
-        {
-            return BadRequest("Bad credentials");
-        }
-
-        var user = _context.Users.FirstOrDefault(u => u.Email == request.Email);
-
-        if (user is null)
-            return Unauthorized();
-
-        var roleIds = await _context.UserRoles.Where(r => r.UserId == user.Id).Select(x => x.RoleId).ToListAsync();
-        var roles = _context.Roles.Where(x => roleIds.Contains(x.Id)).ToList();
-
-        var accessToken = _tokenService.CreateToken(user, roles);
-        user.RefreshToken = _configuration.GenerateRefreshToken();
-        user.RefreshTokenExpiryTime =
-            DateTime.UtcNow.AddDays(_configuration.GetSection("Jwt:RefreshTokenValidityInDays").Get<int>());
-
-        await _context.SaveChangesAsync();
-
-        return Ok(new AuthResponse
-        {
-            Username = user.UserName!,
-            Email = user.Email!,
-            Token = accessToken,
-            RefreshToken = user.RefreshToken
-        });
+        return Ok(await _authService.Login(request));
     }
 
     [HttpPost("register")]
@@ -81,91 +30,23 @@ public class AccountsController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var user = new ApplicationUser
-        {
-            FullName = request.FullName,
-            BirthDate = request.BirthDate,
-            Gender = request.Gender,
-            PhoneNumber = request.Phone,
-            Address = request.Address,
-            Email = request.Email,
-            UserName = request.Email
-        };
-        var result = await _userManager.CreateAsync(user, request.Password);
-
-        foreach (var error in result.Errors)
-        {
-            ModelState.AddModelError(string.Empty, error.Description);
-        }
-
-        if (!result.Succeeded) return BadRequest(request);
-
-        var findUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
-
-        if (findUser == null) throw new Exception($"User {request.Email} not found");
-
-        // По умолчанию роль Customer
-        await _userManager.AddToRoleAsync(findUser, Roles.Customer);
-
-        return await Authenticate(new AuthRequest
-        {
-            Email = request.Email,
-            Password = request.Password
-        });
+        return Ok(await _authService.Register(request));
     }
 
-    [HttpPost]
-    [Route("refresh-token")]
+    [HttpPost("refresh")]
     public async Task<IActionResult> RefreshToken(Token? tokenModel)
     {
-        if (tokenModel is null)
-        {
-            return BadRequest("Invalid client request");
-        }
-
-        var accessToken = tokenModel.AccessToken;
-        var refreshToken = tokenModel.RefreshToken;
-        var principal = _configuration.GetPrincipalFromExpiredToken(accessToken);
-
-        if (principal == null)
-        {
-            return BadRequest("Invalid access token or refresh token");
-        }
-
-        var username = principal.Identity!.Name;
-        var user = await _userManager.FindByNameAsync(username!);
-
-        if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
-        {
-            return BadRequest("Invalid access token or refresh token");
-        }
-
-        var newAccessToken = _configuration.CreateToken(principal.Claims.ToList());
-        var newRefreshToken = _configuration.GenerateRefreshToken();
-
-        user.RefreshToken = newRefreshToken;
-        await _userManager.UpdateAsync(user);
-
-        return new ObjectResult(new
-        {
-            accessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken),
-            refreshToken = newRefreshToken
-        });
+        if (tokenModel is null) return BadRequest("Invalid client request");
+        return Ok(await _authService.RefreshToken(tokenModel));
     }
 
     [Authorize]
-    [HttpPost]
-    [Route("revoke")]
+    [HttpPost("revoke")]
     public async Task<IActionResult> Revoke()
     {
         var userEmail = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
-        var user = await _userManager.FindByNameAsync(userEmail);
-        if (user == null) return BadRequest("Invalid user name");
-
-        user.RefreshToken = null;
-        user.RefreshTokenExpiryTime = null;
-        await _userManager.UpdateAsync(user);
-
+        if (userEmail == null) return BadRequest("Invalid user name");
+        await _authService.Revoke(userEmail);
         return Ok();
     }
 }

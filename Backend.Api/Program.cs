@@ -1,10 +1,10 @@
 using AutoMapper;
+using Common.Middleware.ExceptionHandler;
 using DeliveryBackend.Configurations;
 using DeliveryBackend.Data;
 using DeliveryBackend.Jobs;
 using DeliveryBackend.Mappings;
 using DeliveryBackend.Services;
-using DeliveryBackend.Services.ExceptionHandler;
 using DeliveryBackend.Services.Interfaces;
 using DeliveryBackend.Services.ValidateTokenPolicy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -48,12 +48,6 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 // Auth
 builder.Services.AddSingleton<IAuthorizationHandler, ValidateTokenRequirementHandler>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy(
-        "ValidateToken",
-        policy => policy.Requirements.Add(new ValidateTokenRequirement()));
-});
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -68,6 +62,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
         };
     });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(
+        "ValidateToken",
+        policy => policy.Requirements.Add(new ValidateTokenRequirement()));
+});
 
 // Quartz
 builder.Services.AddQuartz(q =>
@@ -87,7 +87,7 @@ builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 var app = builder.Build();
 
 // Middleware Exceptions
-app.UseExceptionHandlerMiddleware();  
+app.UseExceptionHandlerMiddleware();
 
 // Auto Migration
 using var serviceScope = app.Services.CreateScope();

@@ -1,4 +1,4 @@
-﻿namespace DeliveryBackend.DTO;
+﻿namespace Common.Middleware.ExceptionHandler;
 
 public class Response
 {

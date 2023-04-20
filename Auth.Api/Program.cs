@@ -1,7 +1,9 @@
 using System.Text;
 using Auth.BL.Services;
+using Auth.Common.Interfaces;
 using Auth.DAL;
 using Auth.DAL.Entities;
+using Common.Middleware.ExceptionHandler;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<AppDbContext>(opt => 
+builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
 
 builder.Services.AddCors(c => c.AddPolicy("cors", opt =>
@@ -25,8 +27,11 @@ builder.Services.AddCors(c => c.AddPolicy("cors", opt =>
 }));
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 
-builder.Services.AddAuthentication(opt => {
+builder.Services.AddAuthentication(opt =>
+    {
         opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
@@ -67,36 +72,22 @@ builder.Services.AddSwaggerGen(option =>
         BearerFormat = "JWT",
         Scheme = "Bearer"
     });
-    option.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[]{}
-        }
-    });
 });
 
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
+// Middleware Exceptions
+app.UseExceptionHandlerMiddleware();
+
 // Auto Migration
 using var serviceScope = app.Services.CreateScope();
 var context = serviceScope.ServiceProvider.GetService<AppDbContext>();
 context?.Database.Migrate();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseRouting();

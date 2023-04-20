@@ -1,8 +1,7 @@
-﻿using System.Net;
-using DeliveryBackend.DTO;
+﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
-namespace DeliveryBackend.Services.ExceptionHandler;
+namespace Common.Middleware.ExceptionHandler;
 
 public class ExceptionsService
 {

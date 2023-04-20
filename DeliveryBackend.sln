@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Common", "Auth.Common\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.BL", "Auth.BL\Auth.BL.csproj", "{8F077934-C69E-471B-97DA-045AF85DC785}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{7CC4CD43-391C-461A-9A15-AEC427671CB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{8F077934-C69E-471B-97DA-045AF85DC785}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F077934-C69E-471B-97DA-045AF85DC785}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F077934-C69E-471B-97DA-045AF85DC785}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CC4CD43-391C-461A-9A15-AEC427671CB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CC4CD43-391C-461A-9A15-AEC427671CB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CC4CD43-391C-461A-9A15-AEC427671CB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CC4CD43-391C-461A-9A15-AEC427671CB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3F7277B1-9492-4AE9-B87E-35AADF92BFD5} = {56E63031-4AE8-4026-83A7-CAAAE6A95254}

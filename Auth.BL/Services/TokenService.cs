@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using Auth.Common.Extensions;
-using Auth.DAL;
+using Auth.Common.Interfaces;
 using Auth.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;

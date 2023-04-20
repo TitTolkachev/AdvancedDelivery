@@ -31,6 +31,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Auth.BL\Auth.BL.csproj" />
+      <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
