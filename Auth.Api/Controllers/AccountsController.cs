@@ -160,7 +160,7 @@ public class AccountsController : ControllerBase
     {
         var userEmail = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
         var user = await _userManager.FindByNameAsync(userEmail);
-        if (user == null) return AuthorizationFailure("Invalid user name");
+        if (user == null) return BadRequest("Invalid user name");
 
         user.RefreshToken = null;
         await _userManager.UpdateAsync(user);
