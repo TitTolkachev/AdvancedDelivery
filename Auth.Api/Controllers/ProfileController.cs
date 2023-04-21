@@ -3,6 +3,7 @@ using Auth.Common.Dto;
 using Auth.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Auth.Api.Controllers;
 
@@ -19,6 +20,7 @@ public class ProfileController : ControllerBase
 
     [Authorize]
     [HttpGet]
+    [SwaggerOperation(Summary = "Get user profile")]
     public async Task<ActionResult<ProfileResponse>> GetUserProfile()
     {
         var userEmail = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
@@ -28,6 +30,7 @@ public class ProfileController : ControllerBase
 
     [Authorize]
     [HttpPut]
+    [SwaggerOperation(Summary = "Change user profile")]
     public async Task<ActionResult> ChangeUserProfile([FromBody] ProfileRequest request)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -41,6 +44,7 @@ public class ProfileController : ControllerBase
     
     [Authorize]
     [HttpDelete]
+    [SwaggerOperation(Summary = "Delete user profile")]
     public async Task<ActionResult> DeleteProfile()
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -55,6 +59,7 @@ public class ProfileController : ControllerBase
     [Authorize]
     [HttpPut]
     [Route("password")]
+    [SwaggerOperation(Summary = "Change user password (requires old and new passwords)")]
     public async Task<ActionResult> ChangeUserPassword([FromBody] PasswordChange passwords)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);

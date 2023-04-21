@@ -3,6 +3,7 @@ using Auth.Common.Dto;
 using Auth.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Auth.Api.Controllers;
 
@@ -18,6 +19,7 @@ public class AccountsController : ControllerBase
     }
 
     [HttpPost("login")]
+    [SwaggerOperation(Summary = "User login")]
     public async Task<ActionResult<AuthResponse>> Authenticate([FromBody] AuthRequest request)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -26,6 +28,7 @@ public class AccountsController : ControllerBase
     }
 
     [HttpPost("register")]
+    [SwaggerOperation(Summary = "User register")]
     public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -34,6 +37,7 @@ public class AccountsController : ControllerBase
     }
 
     [HttpPost("refresh")]
+    [SwaggerOperation(Summary = "Refresh token (returns new access and refresh tokens)")]
     public async Task<ActionResult<Token>> RefreshToken(Token? tokenModel)
     {
         if (tokenModel is null) return BadRequest("Invalid client request");
@@ -42,6 +46,7 @@ public class AccountsController : ControllerBase
 
     [Authorize]
     [HttpPost("revoke")]
+    [SwaggerOperation(Summary = "Disable user refresh token")]
     public async Task<ActionResult> Revoke()
     {
         var userEmail = HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;

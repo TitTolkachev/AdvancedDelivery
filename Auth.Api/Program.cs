@@ -62,6 +62,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<long>>()
 
 builder.Services.AddSwaggerGen(option =>
 {
+    option.EnableAnnotations();
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Auth", Version = "v1" });
 });
 
