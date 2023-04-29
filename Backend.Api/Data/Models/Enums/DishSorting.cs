@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace DeliveryBackend.Data.Models.Enums;
+﻿namespace DeliveryBackend.Data.Models.Enums;
 
 public enum DishSorting
 {

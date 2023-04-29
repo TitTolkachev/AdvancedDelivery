@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DeliveryBackend.DTO;
+namespace Backend.Common.Dto;
 
-public class UserDto
+public class UserEditModel
 {
-    public Guid Id { get; set; }
     [Required]
     [MinLength(1)]
     public string FullName { get; set; }
@@ -12,9 +11,6 @@ public class UserDto
     [Required]
     public string Gender { get; set; }
     public string? Address { get; set; }
-    [MinLength(1)]
-    [EmailAddress]
-    public string? Email { get; set; }
     [Phone]
     public string? PhoneNumber { get; set; }
 }

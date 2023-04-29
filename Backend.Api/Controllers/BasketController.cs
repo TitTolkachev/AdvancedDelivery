@@ -1,5 +1,5 @@
-﻿using DeliveryBackend.DTO;
-using DeliveryBackend.Services.Interfaces;
+﻿using Backend.Common.Dto;
+using Backend.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

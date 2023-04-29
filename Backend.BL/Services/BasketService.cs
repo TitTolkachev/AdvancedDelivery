@@ -1,10 +1,11 @@
-﻿using Backend.DAL;
+﻿using Backend.Common.Dto;
+using Backend.Common.Interfaces;
+using Backend.DAL;
 using Backend.DAL.Entities;
-using DeliveryBackend.DTO;
-using DeliveryBackend.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
-namespace DeliveryBackend.Services;
+namespace Backend.BL.Services;
 
 public class BasketService : IBasketService
 {

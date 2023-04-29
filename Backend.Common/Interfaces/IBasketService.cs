@@ -1,6 +1,6 @@
-﻿using DeliveryBackend.DTO;
+﻿using Backend.Common.Dto;
 
-namespace DeliveryBackend.Services.Interfaces;
+namespace Backend.Common.Interfaces;
 
 public interface IBasketService
 {

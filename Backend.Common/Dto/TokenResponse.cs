@@ -1,4 +1,4 @@
-﻿namespace DeliveryBackend.DTO;
+﻿namespace Backend.Common.Dto;
 
 public class TokenResponse
 {

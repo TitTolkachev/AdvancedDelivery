@@ -1,4 +1,4 @@
-﻿using DeliveryBackend.DTO;
+﻿using Backend.Common.Dto;
 using DeliveryBackend.DTO.Queries;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

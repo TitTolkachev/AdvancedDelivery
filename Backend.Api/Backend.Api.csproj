@@ -38,6 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Backend.Common\Backend.Common.csproj" />
       <ProjectReference Include="..\Backend.DAL\Backend.DAL.csproj" />
       <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>

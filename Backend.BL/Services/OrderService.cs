@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
+using Backend.Common.Dto;
+using Backend.Common.Interfaces;
 using Backend.DAL;
 using Backend.DAL.Entities;
 using DeliveryBackend.Data.Models.Enums;
-using DeliveryBackend.DTO;
-using DeliveryBackend.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace DeliveryBackend.Services;
+namespace Backend.BL.Services;
 
 public class OrderService : IOrderService
 {

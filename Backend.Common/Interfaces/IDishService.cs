@@ -1,7 +1,7 @@
-﻿using DeliveryBackend.DTO;
+﻿using Backend.Common.Dto;
 using DeliveryBackend.DTO.Queries;
 
-namespace DeliveryBackend.Services.Interfaces;
+namespace Backend.Common.Interfaces;
 
 public interface IDishService
 {

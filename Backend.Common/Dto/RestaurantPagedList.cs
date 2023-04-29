@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DeliveryBackend.DTO;
+namespace Backend.Common.Dto;
 
-public class DishPagedListDto
+public class RestaurantPagedList
 {
     [Required] 
-    public List<DishDto> Dishes { get; set; }
+    public List<Restaurant> Restaurants { get; set; }
     [Required]
     public PageInfoModel Pagination { get; set; }
 }

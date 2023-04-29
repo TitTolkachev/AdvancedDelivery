@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DeliveryBackend.Data.Models.Enums;
 
-namespace DeliveryBackend.DTO;
+namespace Backend.Common.Dto;
 
 public class OrderInfoDto
 {

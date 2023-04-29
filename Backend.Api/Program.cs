@@ -1,11 +1,10 @@
 using AutoMapper;
+using Backend.Common.Interfaces;
 using Backend.DAL;
 using Common.Middleware.ExceptionHandler;
 using DeliveryBackend.Configurations;
 using DeliveryBackend.Jobs;
 using DeliveryBackend.Mappings;
-using DeliveryBackend.Services;
-using DeliveryBackend.Services.Interfaces;
 using DeliveryBackend.Services.ValidateTokenPolicy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

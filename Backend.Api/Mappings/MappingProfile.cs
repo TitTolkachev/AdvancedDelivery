@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Backend.Common.Dto;
 using Backend.DAL.Entities;
-using DeliveryBackend.DTO;
 
 namespace DeliveryBackend.Mappings;
 
