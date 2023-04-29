@@ -1,10 +1,12 @@
 ﻿using System.Text.RegularExpressions;
 using Backend.DAL;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 
-namespace DeliveryBackend.Services.ValidateTokenPolicy;
+namespace Backend.BL.Services.ValidateTokenPolicy;
 
 public class ValidateTokenRequirementHandler : AuthorizationHandler<ValidateTokenRequirement>
 {

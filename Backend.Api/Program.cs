@@ -1,17 +1,16 @@
 using AutoMapper;
+using Backend.BL.Services;
+using Backend.BL.Services.ValidateTokenPolicy;
 using Backend.Common.Interfaces;
+using Backend.Common.Mappings;
 using Backend.DAL;
 using Common.Middleware.ExceptionHandler;
 using DeliveryBackend.Configurations;
-using DeliveryBackend.Jobs;
-using DeliveryBackend.Mappings;
-using DeliveryBackend.Services.ValidateTokenPolicy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,19 +67,20 @@ builder.Services.AddAuthorization(options =>
         policy => policy.Requirements.Add(new ValidateTokenRequirement()));
 });
 
+// TODO(Перенести в Auth)
 // Quartz
-builder.Services.AddQuartz(q =>
-{
-    q.UseMicrosoftDependencyInjectionJobFactory();
-    var jobKey = new JobKey("DeleteInvalidTokensJob");
-    q.AddJob<DeleteInvalidTokensJob>(opts => opts.WithIdentity(jobKey));
-    q.AddTrigger(opts => opts
-        .ForJob(jobKey)
-        .WithIdentity("DeleteInvalidTokensJob-trigger")
-        .WithCronSchedule("0 0 0 ? * *")
-    );
-});
-builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+// builder.Services.AddQuartz(q =>
+// {
+//     q.UseMicrosoftDependencyInjectionJobFactory();
+//     var jobKey = new JobKey("DeleteInvalidTokensJob");
+//     q.AddJob<DeleteInvalidTokensJob>(opts => opts.WithIdentity(jobKey));
+//     q.AddTrigger(opts => opts
+//         .ForJob(jobKey)
+//         .WithIdentity("DeleteInvalidTokensJob-trigger")
+//         .WithCronSchedule("0 0 0 ? * *")
+//     );
+// });
+// builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 // Build App
 var app = builder.Build();

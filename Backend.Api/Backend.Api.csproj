@@ -33,11 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Data\Models\Enums" />
-      <Folder Include="Migrations\" />
-    </ItemGroup>
-
-    <ItemGroup>
+      <ProjectReference Include="..\Backend.BL\Backend.BL.csproj" />
       <ProjectReference Include="..\Backend.Common\Backend.Common.csproj" />
       <ProjectReference Include="..\Backend.DAL\Backend.DAL.csproj" />
       <ProjectReference Include="..\Common\Common.csproj" />

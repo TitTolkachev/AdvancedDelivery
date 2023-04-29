@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace DeliveryBackend.Services.ValidateTokenPolicy;
+namespace Backend.BL.Services.ValidateTokenPolicy;
 
 public class ValidateTokenRequirement : IAuthorizationRequirement
 {

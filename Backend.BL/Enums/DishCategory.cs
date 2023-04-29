@@ -1,4 +1,4 @@
-﻿namespace DeliveryBackend.Data.Models.Enums;
+﻿namespace Backend.BL.Enums;
 
 public enum DishCategory
 {

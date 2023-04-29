@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace DeliveryBackend.Configurations;
 
+// TODO(Избавится от этого)
 public class JwtConfigurations
 {
     public const string Issuer = "DeliveryBackendDevelop";

@@ -2,7 +2,7 @@
 using Backend.Common.Dto;
 using Backend.DAL.Entities;
 
-namespace DeliveryBackend.Mappings;
+namespace Backend.Common.Mappings;
 
 public class MappingProfile : Profile
 {
