@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using DeliveryBackend.Data;
+using Backend.DAL;
+using Backend.DAL.Entities;
+using DeliveryBackend.Data.Models.Enums;
 using DeliveryBackend.DTO;
 using DeliveryBackend.DTO.Queries;
-using DeliveryBackend.Data.Models.Entities;
-using DeliveryBackend.Data.Models.Enums;
 using DeliveryBackend.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

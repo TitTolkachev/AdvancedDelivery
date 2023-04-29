@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DeliveryBackend.Data.Models.Entities;
+namespace Backend.DAL.Entities;
 
-public class Rating
+public class Cart
 {
     public Guid Id { get; set; }
     
@@ -14,11 +14,15 @@ public class Rating
     public Dish Dish { get; set; }
     
     [Required]
+    public int Amount { get; set; }
+    
+    [Required]
     public Guid UserId { get; set; }
     [Required]
     [ForeignKey("UserId")]
     public User User { get; set; }
-    
-    [Required]
-    public int RatingScore { get; set; }
+
+    public Guid? OrderId { get; set; }
+    [ForeignKey("OrderId")]
+    public virtual Order Order { get; set; }
 }

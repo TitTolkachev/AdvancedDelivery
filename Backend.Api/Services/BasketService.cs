@@ -1,6 +1,6 @@
-﻿using DeliveryBackend.Data;
+﻿using Backend.DAL;
+using Backend.DAL.Entities;
 using DeliveryBackend.DTO;
-using DeliveryBackend.Data.Models.Entities;
 using DeliveryBackend.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

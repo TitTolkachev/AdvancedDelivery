@@ -1,5 +1,5 @@
-﻿using DeliveryBackend.Configurations;
-using DeliveryBackend.Data;
+﻿using Backend.DAL;
+using DeliveryBackend.Configurations;
 using Quartz;
 
 namespace DeliveryBackend.Jobs;

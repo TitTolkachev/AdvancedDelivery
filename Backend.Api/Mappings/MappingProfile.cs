@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DeliveryBackend.Data.Models.Entities;
+using Backend.DAL.Entities;
 using DeliveryBackend.DTO;
 
 namespace DeliveryBackend.Mappings;

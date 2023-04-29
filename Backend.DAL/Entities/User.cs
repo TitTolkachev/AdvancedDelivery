@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DeliveryBackend.Data.Models.Entities;
+namespace Backend.DAL.Entities;
 
 public class User
 {

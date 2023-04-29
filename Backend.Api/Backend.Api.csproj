@@ -20,23 +20,25 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.29.0" />
-        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.29.0" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.2" />
+        <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.30.0" />
+        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.30.0" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.3" />
         <PackageReference Include="Quartz.AspNetCore" Version="3.5.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
         <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.5.0" />
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.5.0" />
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.29.0" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.0" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Data\Models\Enums" />
+      <Folder Include="Migrations\" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Backend.DAL\Backend.DAL.csproj" />
       <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DeliveryBackend.Data;
-using DeliveryBackend.Data.Models.Entities;
+using Backend.DAL;
+using Backend.DAL.Entities;
 using DeliveryBackend.Data.Models.Enums;
 using DeliveryBackend.DTO;
 using DeliveryBackend.Services.Interfaces;

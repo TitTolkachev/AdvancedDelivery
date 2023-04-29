@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DeliveryBackend.Data.Models.Enums;
 
-namespace DeliveryBackend.Data.Models.Entities;
+namespace Backend.DAL.Entities;
 
 public class Dish
 {

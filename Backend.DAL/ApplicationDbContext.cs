@@ -1,9 +1,9 @@
-﻿using DeliveryBackend.Data.Models.Entities;
+﻿using Backend.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace DeliveryBackend.Data;
+namespace Backend.DAL;
 
-public class ApplicationDbContext : DbContext
+public sealed class ApplicationDbContext : DbContext
 {
     public DbSet<Rating> Ratings { get; set; }
     public DbSet<Dish> Dishes { get; set; }

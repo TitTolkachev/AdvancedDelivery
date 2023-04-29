@@ -1,7 +1,7 @@
 using AutoMapper;
+using Backend.DAL;
 using Common.Middleware.ExceptionHandler;
 using DeliveryBackend.Configurations;
-using DeliveryBackend.Data;
 using DeliveryBackend.Jobs;
 using DeliveryBackend.Mappings;
 using DeliveryBackend.Services;
