@@ -71,4 +71,9 @@
       <Folder Include="Models\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\AdminPanel.BL\AdminPanel.BL.csproj" />
+      <ProjectReference Include="..\AdminPanel.Common\AdminPanel.Common.csproj" />
+    </ItemGroup>
+
 </Project>

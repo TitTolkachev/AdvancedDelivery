@@ -1,1 +1,33 @@
-﻿List Restaurants
+﻿@model IEnumerable<AdminPanel.Common.Models.Restaurant>
+
+<div class="mt-2" style="width:50%">
+    <div class="row">
+        <h2>Restaurants</h2>
+        <div class="col-md-4">
+            <a href="/Restaurant/Create" class="btn btn-primary">Add Restaurant</a>
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th></th>
+            </tr>
+
+            @foreach (var restaurant in Model)
+            {
+                <tr>
+                    <td>@restaurant.Id</td>
+                    <td>@restaurant.Name</td>
+                    <td>@restaurant.Address</td>
+                    <td>
+                        <a class="btn btn-success" href="/Restaurant/Change?id=@restaurant.Id">Edit</a>
+                        <a class="btn btn-danger" href="/Restaurant/Delete?id=@restaurant.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+            </thead>
+        </table>
+    </div>
+</div>
