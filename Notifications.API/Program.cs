@@ -1,4 +1,3 @@
-using Common.Middleware.ExceptionHandler;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Notifications.BL.Hubs;
@@ -15,11 +14,13 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
 
-// Services
-builder.Services.AddScoped<INotificationsService, NotificationsService>();
 
 // SignalR
+builder.Services.AddSingleton<NotificationsHub>();
 builder.Services.AddSignalR();
+
+// Services
+builder.Services.AddScoped<INotificationsService, NotificationsService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -29,10 +30,24 @@ builder.Services.AddSwaggerGen(option =>
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Notifications", Version = "v1" });
 });
 
+// Cors
+const string myAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(myAllowSpecificOrigins,
+        policy =>
+        {
+            policy.SetIsOriginAllowed(_ => true)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+});
+
 var app = builder.Build();
 
 // Middleware Exceptions
-app.UseExceptionHandlerMiddleware();
+//app.UseExceptionHandlerMiddleware();
 
 // Auto Migration
 using var serviceScope = app.Services.CreateScope();
@@ -46,9 +61,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors(myAllowSpecificOrigins);
 
 app.MapControllers();
 
