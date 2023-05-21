@@ -14,10 +14,14 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
 
-
 // SignalR
 builder.Services.AddSingleton<NotificationsHub>();
 builder.Services.AddSignalR();
+
+// Rabbit
+builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
+builder.Services.AddSingleton<IConsumerService, ConsumerService>();
+builder.Services.AddHostedService<ConsumerHostedService>();
 
 // Services
 builder.Services.AddScoped<INotificationsService, NotificationsService>();
