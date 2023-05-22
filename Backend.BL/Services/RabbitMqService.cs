@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Backend.Common.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Notifications.BL.Configuration;
-using Notifications.Common.Interfaces;
 using RabbitMQ.Client;
 
-namespace Notifications.BL.Services;
+namespace Backend.BL.Services;
 
 public class RabbitMqService : IRabbitMqService
 {
@@ -25,7 +25,7 @@ public class RabbitMqService : IRabbitMqService
             UserName = _configuration.Username,
             Password = _configuration.Password,
             HostName = _configuration.HostName,
-            DispatchConsumersAsync = true
+            VirtualHost = "/"
         };
         var channel = connection.CreateConnection();
         return channel;

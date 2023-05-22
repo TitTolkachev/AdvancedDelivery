@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Text;
+using Microsoft.Extensions.Configuration;
+using Notifications.Common.Dto;
 using Notifications.Common.Interfaces;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -9,22 +11,23 @@ public class ConsumerService : IConsumerService, IDisposable
 {
     private readonly IModel _model;
     private readonly IConnection _connection;
+    private readonly INotificationsService _notificationsService;
 
-    private static IConfiguration _configuration = null!;
+    private static string _queueName = null!;
 
-    public ConsumerService(IRabbitMqService rabbitMqService, IConfiguration configuration)
+    public ConsumerService(IRabbitMqService rabbitMqService, IConfiguration configuration,
+        INotificationsService notificationsService)
     {
-        _configuration = configuration;
+        _notificationsService = notificationsService;
+        _queueName = configuration.GetSection("MqConfiguration:QueueName").Get<string>();
         _connection = rabbitMqService.CreateChannel();
         _model = _connection.CreateModel();
-        _model.QueueDeclare(QueueName, durable: true, exclusive: false, autoDelete: false);
-        _model.ExchangeDeclare(_configuration.GetSection("MqConfiguration:my_exchange_name").Get<string>(),
+        _model.QueueDeclare(_queueName, durable: true, exclusive: false, autoDelete: false);
+        _model.ExchangeDeclare(configuration.GetSection("MqConfiguration:ExchangeName").Get<string>(),
             ExchangeType.Fanout, durable: true, autoDelete: false);
-        _model.QueueBind(QueueName, _configuration.GetSection("MqConfiguration:my_exchange_name").Get<string>(),
+        _model.QueueBind(_queueName, configuration.GetSection("MqConfiguration:ExchangeName").Get<string>(),
             string.Empty);
     }
-
-    private static readonly string QueueName = _configuration.GetSection("MqConfiguration:my_queue_name").Get<string>();
 
     public async Task ReadMessages()
     {
@@ -32,16 +35,23 @@ public class ConsumerService : IConsumerService, IDisposable
         consumer.Received += async (_, ea) =>
         {
             var body = ea.Body.ToArray();
-            var text = System.Text.Encoding.UTF8.GetString(body);
+            var text = Encoding.UTF8.GetString(body);
+            
+            // TODO(Убрать)
             Console.WriteLine(text);
-            
-            // TODO(Сделать обращение к сервису с веб-сокетами)
-            // 
-            
+
+            await _notificationsService.Send(new NotificationReceived
+            {
+                UserId = Guid.NewGuid(),
+                OrderId = Guid.NewGuid(),
+                Status = Status.New,
+                Text = text
+            });
+
             await Task.CompletedTask;
             _model.BasicAck(ea.DeliveryTag, false);
         };
-        _model.BasicConsume(QueueName, false, consumer);
+        _model.BasicConsume(_queueName, false, consumer);
         await Task.CompletedTask;
     }
 

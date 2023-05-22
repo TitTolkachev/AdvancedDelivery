@@ -4,5 +4,5 @@ namespace Notifications.Common.Interfaces;
 
 public interface INotificationsService
 {
-    public Task AcceptAndSend(NotificationReceived notification);
+    public Task Send(NotificationReceived notification);
 }

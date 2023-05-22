@@ -4,7 +4,6 @@ using Backend.BL.Services.ValidateTokenPolicy;
 using Backend.Common.Interfaces;
 using Backend.Common.Mappings;
 using Backend.DAL;
-using Common.Middleware.ExceptionHandler;
 using DeliveryBackend.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +14,8 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -31,6 +32,10 @@ builder.Services.AddSwaggerGen(c =>
 // DB
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connection));
+
+// Rabbit
+builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
+builder.Services.AddScoped<IProducerService, ProducerService>();
 
 // AutoMapping
 var mapperConfig = new MapperConfiguration(mc => { mc.AddProfile(new MappingProfile()); });
@@ -85,8 +90,9 @@ builder.Services.AddAuthorization(options =>
 // Build App
 var app = builder.Build();
 
+// TODO(Включить)
 // Middleware Exceptions
-app.UseExceptionHandlerMiddleware();
+// app.UseExceptionHandlerMiddleware();
 
 // Auto Migration
 using var serviceScope = app.Services.CreateScope();

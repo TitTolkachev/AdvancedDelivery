@@ -16,7 +16,7 @@ public class NotificationsService : INotificationsService
         _hubContext = hubContext;
     }
 
-    public async Task AcceptAndSend(NotificationReceived notification)
+    public async Task Send(NotificationReceived notification)
     {
         // await _context.Notifications.AddAsync(new Notification
         // {

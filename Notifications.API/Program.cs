@@ -24,7 +24,7 @@ builder.Services.AddSingleton<IConsumerService, ConsumerService>();
 builder.Services.AddHostedService<ConsumerHostedService>();
 
 // Services
-builder.Services.AddScoped<INotificationsService, NotificationsService>();
+builder.Services.AddSingleton<INotificationsService, NotificationsService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();

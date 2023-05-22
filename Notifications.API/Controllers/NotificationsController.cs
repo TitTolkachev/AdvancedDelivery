@@ -22,7 +22,7 @@ public class NotificationsController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        await _notificationsService.AcceptAndSend(bodyData);
+        await _notificationsService.Send(bodyData);
 
         return Ok();
     }
