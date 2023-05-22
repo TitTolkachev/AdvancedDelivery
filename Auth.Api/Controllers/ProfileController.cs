@@ -7,6 +7,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Auth.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/profile")]
 public class ProfileController : ControllerBase
@@ -18,7 +19,6 @@ public class ProfileController : ControllerBase
         _profileService = profileService;
     }
 
-    [Authorize]
     [HttpGet]
     [SwaggerOperation(Summary = "Get user profile")]
     public async Task<ActionResult<ProfileResponse>> GetUserProfile()
@@ -28,7 +28,6 @@ public class ProfileController : ControllerBase
         return Ok(await _profileService.GetUserProfile(userEmail));
     }
 
-    [Authorize]
     [HttpPut]
     [SwaggerOperation(Summary = "Change user profile")]
     public async Task<ActionResult> ChangeUserProfile([FromBody] ProfileRequest request)
@@ -42,7 +41,6 @@ public class ProfileController : ControllerBase
         return Ok();
     }
     
-    [Authorize]
     [HttpDelete]
     [SwaggerOperation(Summary = "Delete user profile")]
     public async Task<ActionResult> DeleteProfile()
@@ -56,7 +54,6 @@ public class ProfileController : ControllerBase
         return Ok();
     }
     
-    [Authorize]
     [HttpPut]
     [Route("password")]
     [SwaggerOperation(Summary = "Change user password (requires old and new passwords)")]

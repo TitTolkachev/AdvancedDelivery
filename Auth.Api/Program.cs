@@ -2,6 +2,7 @@ using System.Text;
 using Auth.BL.Services;
 using Auth.Common.Interfaces;
 using Auth.DAL;
+using Auth.DAL.DbInitializer;
 using Auth.DAL.Entities;
 using Common.Middleware.ExceptionHandler;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,6 +18,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
 builder.Services.AddCors(c => c.AddPolicy("cors", opt =>
 {
@@ -75,8 +77,8 @@ app.UseExceptionHandlerMiddleware();
 
 // Auto Migration
 using var serviceScope = app.Services.CreateScope();
-var context = serviceScope.ServiceProvider.GetService<AppDbContext>();
-context?.Database.Migrate();
+var service = serviceScope.ServiceProvider.GetRequiredService<IDbInitializer>();
+service.Initialize();
 
 app.UseSwagger();
 app.UseSwaggerUI();
