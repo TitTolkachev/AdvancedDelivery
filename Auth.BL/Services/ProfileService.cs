@@ -21,13 +21,14 @@ public class ProfileService : IProfileService
 
     public async Task<ProfileResponse> GetUserProfile(string userEmail)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+        var user = await _userManager.FindByEmailAsync(userEmail);
+        var customer = await _context.Customers.FirstOrDefaultAsync(u => u.User == user);
 
         if (user is not null)
             return new ProfileResponse
             {
-                FullName = user.Address,
-                Address = user.Address,
+                FullName = user.Email,
+                Address = customer?.Address,
                 BirthDate = user.BirthDate,
                 Email = user.Email,
                 Gender = user.Gender,
@@ -56,7 +57,12 @@ public class ProfileService : IProfileService
 
         user.FullName = request.FullName;
         user.PhoneNumber = request.Phone;
-        user.Address = request.Address;
+        if (user.Customer != null)
+        {
+            var customer = _context.Customers.FirstOrDefault(c => c.User == user)!;
+            customer.Address = request.Address;
+            await _context.SaveChangesAsync();
+        }
 
         var result = await _userManager.UpdateAsync(user);
 

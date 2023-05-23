@@ -87,7 +87,6 @@ public class AuthService : IAuthService
             BirthDate = request.BirthDate,
             Gender = request.Gender,
             PhoneNumber = request.Phone,
-            Address = request.Address,
             Email = request.Email,
             UserName = request.Email
         };
@@ -103,11 +102,13 @@ public class AuthService : IAuthService
         }
 
         var findUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
-
         if (findUser == null) throw new Exception($"User {request.Email} not found");
 
-        // По умолчанию роль Customer
+        // Default role is Customer
         await _userManager.AddToRoleAsync(findUser, Roles.Customer);
+        var customer = new Customer { Id = Guid.NewGuid(), Address = request.Address, User = findUser };
+        await _context.Customers.AddAsync(customer);
+        await _context.SaveChangesAsync();
 
         return await Login(new AuthRequest
         {

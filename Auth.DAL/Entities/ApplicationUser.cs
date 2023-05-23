@@ -7,7 +7,14 @@ public class ApplicationUser : IdentityUser<long>
     public string FullName { get; set; } = null!;
     public DateTime? BirthDate { get; set; }
     public string? Gender { get; set; }
-    public string? Address { get; set; }
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
+
+    public Customer? Customer { get; set; }
+
+    public Manager? Manager { get; set; }
+
+    public Courier? Courier { get; set; }
+
+    public Cook? Cook { get; set; }
 }
