@@ -47,5 +47,6 @@ public sealed class ApplicationDbContext : DbContext
         modelBuilder.Entity<Restaurant>().HasIndex(x => x.Name).IsUnique();
 
         modelBuilder.Entity<Menu>().HasKey(x => x.Id);
+        modelBuilder.Entity<Menu>().HasIndex(x => new { x.Name, x.RestaurantId }).IsUnique();
     }
 }

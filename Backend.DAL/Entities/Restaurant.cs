@@ -9,7 +9,7 @@ public class Restaurant
     [Required] public string Name { get; set; } = null!;
 
     public List<Order> Orders { get; set; } = new();
-
+    
     public List<Menu> Menus { get; set; } = new();
 
     public List<Cook> Cooks { get; set; } = new();

@@ -133,7 +133,6 @@ public class OrderService : IOrderService
             throw ex;
         }
 
-
         // В бд всем товарам в корзине проставить, что теперь они в заказе,
         // заодно посчитать стоимость
         var orderId = Guid.NewGuid();
@@ -147,10 +146,29 @@ public class OrderService : IOrderService
             Address = orderCreateDto.Address,
             UserId = userId
         };
+
+        // Проверка, что все блюда из одного ресторана
+        await CheckDishes(cartDishes, orderCreateDto.RestaurantId);
+
         await _context.Orders.AddAsync(newOrder);
         await _context.SaveChangesAsync();
         newOrder.Price = await CreateOrderOperations(orderId, cartDishes);
         await _context.SaveChangesAsync();
+    }
+
+    private async Task CheckDishes(List<Cart> cartDishes, Guid restaurantId)
+    {
+        var menus = await _context.Menus.Where(m => m.Restaurant.Id == restaurantId).ToListAsync();
+
+        foreach (var cartDish in cartDishes)
+        {
+            if (menus.Any(m => m.Dishes.Any(d => d.Id == cartDish.DishId))) continue;
+            var ex = new Exception();
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+                $"Dish with id \"{cartDish.DishId}\" can not be delivered from restaurant with id \"{restaurantId}\""
+            );
+            throw ex;
+        }
     }
 
     public async Task ConfirmOrderDelivery(Guid userId, Guid orderId)
