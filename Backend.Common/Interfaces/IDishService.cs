@@ -1,5 +1,5 @@
 ﻿using Backend.Common.Dto;
-using DeliveryBackend.DTO.Queries;
+using Backend.Common.Dto.Queries;
 
 namespace Backend.Common.Interfaces;
 

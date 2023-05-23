@@ -4,6 +4,7 @@ using Backend.BL.Services.ValidateTokenPolicy;
 using Backend.Common.Interfaces;
 using Backend.Common.Mappings;
 using Backend.DAL;
+using Common.Middleware.ExceptionHandler;
 using DeliveryBackend.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -47,6 +48,7 @@ builder.Services.AddMvc();
 builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IBasketService, BasketService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 
 // Auth
 builder.Services.AddSingleton<IAuthorizationHandler, ValidateTokenRequirementHandler>();
@@ -92,7 +94,7 @@ var app = builder.Build();
 
 // TODO(Включить)
 // Middleware Exceptions
-// app.UseExceptionHandlerMiddleware();
+app.UseExceptionHandlerMiddleware();
 
 // Auto Migration
 using var serviceScope = app.Services.CreateScope();

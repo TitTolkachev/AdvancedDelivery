@@ -1,6 +1,6 @@
 ﻿using Backend.Common.Dto;
+using Backend.Common.Dto.Queries;
 using Backend.Common.Interfaces;
-using DeliveryBackend.DTO.Queries;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -11,27 +11,36 @@ namespace DeliveryBackend.Controllers;
 public class RestaurantController : ControllerBase
 {
     private readonly IProducerService _producerService;
+    private readonly IRestaurantService _restaurantService;
 
-    public RestaurantController(IProducerService producerService)
+    public RestaurantController(IProducerService producerService, IRestaurantService restaurantService)
     {
         _producerService = producerService;
+        _restaurantService = restaurantService;
     }
 
     [HttpGet]
-    [SwaggerOperation(Summary = "Get a list of restaurants")]
-    public async Task<RestaurantPagedList> GetRestaurantList([FromQuery] GetRestaurantListQuery restaurantListQuery)
+    [Route("search")]
+    [SwaggerOperation(Summary = "Get a list of restaurants (with search option)")]
+    public async Task<RestaurantPagedListDto> GetRestaurants([FromQuery] GetRestaurantListQuery restaurantListQuery)
     {
-        // TODO(Не сделано)
-        return null;
+        return await _restaurantService.GetRestaurantList(restaurantListQuery);
     }
 
-    [HttpPost]
-    [SwaggerOperation(Summary = "TEST FOR RABBIT_MQ")]
-    public async Task<OkObjectResult> Test()
+    [HttpGet]
+    [SwaggerOperation(Summary = "Find restaurant by Id")]
+    public async Task<RestaurantDto> GetRestaurant(Guid restaurantId)
     {
-        // publish message  
-        _producerService.SendMessage("Hello everyone!");
-
-        return Ok(null);
+        return await _restaurantService.GetRestaurant(restaurantId);
     }
+
+    // [HttpPost]
+    // [SwaggerOperation(Summary = "TEST FOR RABBIT_MQ")]
+    // public async Task<OkObjectResult> Test()
+    // {
+    //     // publish message  
+    //     _producerService.SendMessage("Hello everyone!");
+    //
+    //     return Ok(null);
+    // }
 }

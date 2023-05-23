@@ -52,6 +52,22 @@ namespace Backend.DAL.Migrations
                     b.ToTable("Carts");
                 });
 
+            modelBuilder.Entity("Backend.DAL.Entities.Cook", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("RestaurantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.ToTable("Cook");
+                });
+
             modelBuilder.Entity("Backend.DAL.Entities.Dish", b =>
                 {
                     b.Property<Guid>("Id")
@@ -70,6 +86,9 @@ namespace Backend.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("MenuId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -85,7 +104,45 @@ namespace Backend.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MenuId");
+
                     b.ToTable("Dishes");
+                });
+
+            modelBuilder.Entity("Backend.DAL.Entities.Manager", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("RestaurantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.ToTable("Manager");
+                });
+
+            modelBuilder.Entity("Backend.DAL.Entities.Menu", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RestaurantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.ToTable("Menu");
                 });
 
             modelBuilder.Entity("Backend.DAL.Entities.Order", b =>
@@ -98,6 +155,9 @@ namespace Backend.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("CookId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("DeliveryTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -107,6 +167,9 @@ namespace Backend.DAL.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("double precision");
 
+                    b.Property<Guid?>("RestaurantId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
@@ -115,6 +178,10 @@ namespace Backend.DAL.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CookId");
+
+                    b.HasIndex("RestaurantId");
 
                     b.HasIndex("UserId");
 
@@ -144,6 +211,24 @@ namespace Backend.DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("Ratings");
+                });
+
+            modelBuilder.Entity("Backend.DAL.Entities.Restaurant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Restaurants");
                 });
 
             modelBuilder.Entity("Backend.DAL.Entities.Token", b =>
@@ -220,8 +305,52 @@ namespace Backend.DAL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Backend.DAL.Entities.Cook", b =>
+                {
+                    b.HasOne("Backend.DAL.Entities.Restaurant", "Restaurant")
+                        .WithMany("Cooks")
+                        .HasForeignKey("RestaurantId");
+
+                    b.Navigation("Restaurant");
+                });
+
+            modelBuilder.Entity("Backend.DAL.Entities.Dish", b =>
+                {
+                    b.HasOne("Backend.DAL.Entities.Menu", null)
+                        .WithMany("Dishes")
+                        .HasForeignKey("MenuId");
+                });
+
+            modelBuilder.Entity("Backend.DAL.Entities.Manager", b =>
+                {
+                    b.HasOne("Backend.DAL.Entities.Restaurant", "Restaurant")
+                        .WithMany("Managers")
+                        .HasForeignKey("RestaurantId");
+
+                    b.Navigation("Restaurant");
+                });
+
+            modelBuilder.Entity("Backend.DAL.Entities.Menu", b =>
+                {
+                    b.HasOne("Backend.DAL.Entities.Restaurant", "Restaurant")
+                        .WithMany("Menus")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurant");
+                });
+
             modelBuilder.Entity("Backend.DAL.Entities.Order", b =>
                 {
+                    b.HasOne("Backend.DAL.Entities.Cook", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("CookId");
+
+                    b.HasOne("Backend.DAL.Entities.Restaurant", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("RestaurantId");
+
                     b.HasOne("Backend.DAL.Entities.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
@@ -250,6 +379,11 @@ namespace Backend.DAL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Backend.DAL.Entities.Cook", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
             modelBuilder.Entity("Backend.DAL.Entities.Dish", b =>
                 {
                     b.Navigation("Carts");
@@ -257,9 +391,25 @@ namespace Backend.DAL.Migrations
                     b.Navigation("Ratings");
                 });
 
+            modelBuilder.Entity("Backend.DAL.Entities.Menu", b =>
+                {
+                    b.Navigation("Dishes");
+                });
+
             modelBuilder.Entity("Backend.DAL.Entities.Order", b =>
                 {
                     b.Navigation("Carts");
+                });
+
+            modelBuilder.Entity("Backend.DAL.Entities.Restaurant", b =>
+                {
+                    b.Navigation("Cooks");
+
+                    b.Navigation("Managers");
+
+                    b.Navigation("Menus");
+
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Backend.DAL.Entities.User", b =>

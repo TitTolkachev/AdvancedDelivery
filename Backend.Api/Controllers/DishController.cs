@@ -1,6 +1,6 @@
 ﻿using Backend.Common.Dto;
+using Backend.Common.Dto.Queries;
 using Backend.Common.Interfaces;
-using DeliveryBackend.DTO.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -19,7 +19,7 @@ public class DishController : ControllerBase
     }
 
     [HttpGet]
-    [SwaggerOperation(Summary = "Get a list of dishes (menu)")]
+    [SwaggerOperation(Summary = "Get a list of dishes from restaurant")]
     public async Task<DishPagedListDto> GetDishList([FromQuery] GetDishListQuery dishListQuery)
     {
         return await _dishService.GetDishList(dishListQuery);
@@ -37,7 +37,7 @@ public class DishController : ControllerBase
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
     [Route("{id}/rating/check")]
-    [SwaggerOperation(Summary = "Checks if user is able to set rating of the dish")]
+    [SwaggerOperation(Summary = "Check if user is able to set rating of the dish")]
     public async Task<bool> CheckDishRating(Guid id)
     {
         return await _dishService.CheckDishRating(id, Guid.Parse(User.Identity.Name));
@@ -52,8 +52,9 @@ public class DishController : ControllerBase
     {
         await _dishService.SetDishRating(id, rating, Guid.Parse(User.Identity.Name));
     }
-    
-    
+
+
+    // TODO(Переделать)
     // --------------------
     // --------------------
     [HttpPost]

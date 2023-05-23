@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Backend.BL.Enums;
 using Backend.Common.Dto;
+using Backend.Common.Dto.Queries;
 using Backend.Common.Interfaces;
 using Backend.DAL;
 using Backend.DAL.Entities;
-using DeliveryBackend.DTO.Queries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

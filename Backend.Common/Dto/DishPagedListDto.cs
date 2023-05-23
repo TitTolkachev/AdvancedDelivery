@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DeliveryBackend.DTO;
 
 namespace Backend.Common.Dto;
 
