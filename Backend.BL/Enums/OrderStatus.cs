@@ -2,6 +2,10 @@
 
 public enum OrderStatus
 {
-    InProcess,
-    Delivered
+    Created,
+    Kitchen,
+    Packaging,
+    Delivery,
+    Delivered,
+    Canceled
 }

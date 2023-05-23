@@ -5,6 +5,7 @@ namespace Backend.Common.Dto;
 public class OrderDto
 {
     public Guid Id { get; set; }
+    [Required] public int Number { get; set; }
     [Required] public DateTime DeliveryTime { get; set; }
     [Required] public DateTime OrderTime { get; set; }
     [Required] public string Status { get; set; } = null!;

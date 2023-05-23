@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Backend.BL.Enums;
 using Backend.Common.Dto;
+using Backend.Common.Dto.Queries;
 using Backend.Common.Interfaces;
 using Backend.DAL;
 using Backend.DAL.Entities;
@@ -14,6 +15,8 @@ public class OrderService : IOrderService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
+
+    private const int PageSize = 10;
 
     public OrderService(ApplicationDbContext context, IMapper mapper)
     {
@@ -102,11 +105,28 @@ public class OrderService : IOrderService
         }
     }
 
-    public async Task<List<OrderInfoDto>> GetOrders(Guid userId)
+    public async Task<List<OrderInfoDto>> GetOrders(Guid userId, GetOrdersListQuery query)
     {
-        var orders = await _context.Orders.Where(x => x.UserId == userId).ToListAsync();
+        var orders = _context.Orders.Where(x =>
+            x.UserId == userId &&
+            x.Number.ToString().Contains(query.SearchOrderNumber ?? string.Empty) &&
+            x.OrderTime >= (query.DateStart ?? DateTime.MinValue) &&
+            x.DeliveryTime <= (query.DateEnd ?? DateTime.MaxValue)
+        );
 
-        return _mapper.Map<List<OrderInfoDto>>(orders);
+        if (orders == null || query.Page > (orders.Count() + PageSize - 1) / PageSize)
+        {
+            var ex = new Exception();
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(), "Orders were not found");
+            throw ex;
+        }
+
+        var selectedOrders = await orders
+            .Skip((query.Page - 1) * PageSize)
+            .Take(Range.EndAt(PageSize))
+            .ToListAsync();
+
+        return _mapper.Map<List<OrderInfoDto>>(selectedOrders);
     }
 
     public async Task CreateOrder(Guid userId, OrderCreateDto orderCreateDto)
@@ -139,9 +159,10 @@ public class OrderService : IOrderService
         var newOrder = new Order
         {
             Id = orderId,
+            Number = await _context.Orders.CountAsync() + 1,
             DeliveryTime = orderCreateDto.DeliveryTime,
             OrderTime = DateTime.UtcNow,
-            Status = OrderStatus.InProcess.ToString(),
+            Status = OrderStatus.Created.ToString(),
             Price = 0,
             Address = orderCreateDto.Address,
             UserId = userId

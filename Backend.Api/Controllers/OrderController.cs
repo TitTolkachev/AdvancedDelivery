@@ -1,4 +1,5 @@
 ﻿using Backend.Common.Dto;
+using Backend.Common.Dto.Queries;
 using Backend.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +12,12 @@ namespace DeliveryBackend.Controllers;
 public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;
-    
+
     public OrderController(IOrderService orderService)
     {
         _orderService = orderService;
     }
-    
+
     [HttpGet]
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
@@ -26,16 +27,16 @@ public class OrderController : ControllerBase
     {
         return await _orderService.GetOrderInfo(Guid.Parse(User.Identity.Name), id);
     }
-    
+
     [HttpGet]
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
     [SwaggerOperation(Summary = "Get a list of orders")]
-    public async Task<List<OrderInfoDto>> GetOrders()
+    public async Task<List<OrderInfoDto>> GetOrders([FromQuery] GetOrdersListQuery query)
     {
-        return await _orderService.GetOrders(Guid.Parse(User.Identity.Name));
+        return await _orderService.GetOrders(Guid.Parse(User.Identity.Name), query);
     }
-    
+
     [HttpPost]
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
@@ -44,7 +45,7 @@ public class OrderController : ControllerBase
     {
         await _orderService.CreateOrder(Guid.Parse(User.Identity.Name), orderCreateDto);
     }
-    
+
     [HttpPost]
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
@@ -54,7 +55,7 @@ public class OrderController : ControllerBase
     {
         await _orderService.ConfirmOrderDelivery(Guid.Parse(User.Identity.Name), id);
     }
-    
+
     [HttpPost]
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
