@@ -28,7 +28,7 @@ public class RestaurantController : ControllerBase
     }
 
     [HttpGet]
-    [SwaggerOperation(Summary = "Find restaurant by Id")]
+    [SwaggerOperation(Summary = "Get restaurant by Id")]
     public async Task<RestaurantDto> GetRestaurant(Guid restaurantId)
     {
         return await _restaurantService.GetRestaurant(restaurantId);

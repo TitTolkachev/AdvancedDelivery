@@ -87,8 +87,8 @@ public class BasketService : IBasketService
         if (dishCartEntity == null)
         {
             var ex = new Exception();
-            ex.Data.Add(StatusCodes.Status404NotFound.ToString(),
-                "Dish not found in cart"
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+                "Dish was not found in cart"
             );
             throw ex;
         }

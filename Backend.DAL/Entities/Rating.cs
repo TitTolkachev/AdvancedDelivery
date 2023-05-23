@@ -11,14 +11,14 @@ public class Rating
     public Guid DishId { get; set; }
     [Required]
     [ForeignKey("DishId")]
-    public Dish Dish { get; set; }
-    
+    public Dish Dish { get; set; } = null!;
+
     [Required]
     public Guid UserId { get; set; }
     [Required]
     [ForeignKey("UserId")]
-    public User User { get; set; }
-    
+    public User User { get; set; } = null!;
+
     [Required]
     public int RatingScore { get; set; }
 }

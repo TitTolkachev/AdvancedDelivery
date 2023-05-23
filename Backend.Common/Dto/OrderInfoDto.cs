@@ -10,7 +10,8 @@ public class OrderInfoDto
     [Required]
     public DateTime OrderTime { get; set; }
     [Required]
-    public string Status { get; set; }
+    public string Status { get; set; } = null!;
+
     [Required]
     public double Price { get; set; }
 }

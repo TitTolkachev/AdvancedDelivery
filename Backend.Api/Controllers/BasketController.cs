@@ -11,12 +11,12 @@ namespace DeliveryBackend.Controllers;
 public class BasketController : ControllerBase
 {
     private readonly IBasketService _basketService;
-    
+
     public BasketController(IBasketService basketService)
     {
         _basketService = basketService;
     }
-    
+
     [HttpGet]
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
@@ -25,7 +25,7 @@ public class BasketController : ControllerBase
     {
         return await _basketService.GetUserCart(Guid.Parse(User.Identity.Name));
     }
-    
+
     [HttpPost]
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
@@ -35,12 +35,12 @@ public class BasketController : ControllerBase
     {
         await _basketService.AddDishToCart(dishId, Guid.Parse(User.Identity.Name));
     }
-    
+
     [HttpDelete]
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
     [Route("dish/{dishId}")]
-    [SwaggerOperation(Summary = "Decrease the number of dishes in the cart(if increase = true), or remove the dish completely(increase = false)")]
+    [SwaggerOperation(Summary = "Decrease the number of dishes in the cart")]
     public async Task DecreaseDishQuantityInCart(Guid dishId)
     {
         await _basketService.RemoveDishFromCart(dishId, Guid.Parse(User.Identity.Name));

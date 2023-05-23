@@ -11,8 +11,8 @@ public class Cart
     public Guid DishId { get; set; }
     [Required]
     [ForeignKey("DishId")]
-    public Dish Dish { get; set; }
-    
+    public Dish Dish { get; set; } = null!;
+
     [Required]
     public int Amount { get; set; }
     
@@ -20,9 +20,9 @@ public class Cart
     public Guid UserId { get; set; }
     [Required]
     [ForeignKey("UserId")]
-    public User User { get; set; }
+    public User User { get; set; } = null!;
 
     public Guid? OrderId { get; set; }
     [ForeignKey("OrderId")]
-    public virtual Order Order { get; set; }
+    public virtual Order Order { get; set; } = null!;
 }

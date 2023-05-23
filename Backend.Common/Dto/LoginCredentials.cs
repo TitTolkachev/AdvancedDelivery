@@ -7,8 +7,9 @@ public class LoginCredentials
     [Required]
     [MinLength(1)]
     [EmailAddress]
-    public string Email { get; set; }
+    public string Email { get; set; } = null!;
+
     [Required]
     [MinLength(1)]
-    public string Password { get; set; }
+    public string Password { get; set; } = null!;
 }

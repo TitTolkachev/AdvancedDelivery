@@ -27,7 +27,7 @@ public class OrderService : IOrderService
         if (orderInfo == null)
         {
             var ex = new Exception();
-            ex.Data.Add(StatusCodes.Status404NotFound.ToString(),
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
                 "Order Info not found"
             );
             throw ex;
@@ -46,7 +46,7 @@ public class OrderService : IOrderService
         if (orderCarts.IsNullOrEmpty())
         {
             var ex = new Exception();
-            ex.Data.Add(StatusCodes.Status404NotFound.ToString(),
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
                 "Dishes in Order not found"
             );
             throw ex;
@@ -62,7 +62,7 @@ public class OrderService : IOrderService
             else
             {
                 var ex = new Exception();
-                ex.Data.Add(StatusCodes.Status404NotFound.ToString(),
+                ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
                     "Dish in Order not found"
                 );
                 throw ex;
@@ -95,7 +95,7 @@ public class OrderService : IOrderService
             };
         {
             var ex = new Exception();
-            ex.Data.Add(StatusCodes.Status404NotFound.ToString(),
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
                 "Empty order list returned"
             );
             throw ex;
@@ -127,11 +127,12 @@ public class OrderService : IOrderService
         if (cartDishes.IsNullOrEmpty())
         {
             var ex = new Exception();
-            ex.Data.Add(StatusCodes.Status404NotFound.ToString(),
-                "Dishes in cart Not Found"
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+                "Dishes in cart were not found"
             );
             throw ex;
         }
+
 
         // В бд всем товарам в корзине проставить, что теперь они в заказе,
         // заодно посчитать стоимость
@@ -159,7 +160,7 @@ public class OrderService : IOrderService
         if (order == null)
         {
             var ex = new Exception();
-            ex.Data.Add(StatusCodes.Status404NotFound.ToString(),
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
                 "Order Info not found"
             );
             throw ex;
@@ -178,9 +179,9 @@ public class OrderService : IOrderService
         await _context.SaveChangesAsync();
     }
 
-    private async Task<double> CreateOrderOperations(Guid orderId, IReadOnlyList<Cart> cartDishes)
+    private async Task<decimal> CreateOrderOperations(Guid orderId, IReadOnlyList<Cart> cartDishes)
     {
-        double res = 0;
+        decimal res = 0;
 
         for (var i = 0; i < cartDishes.Count; i++)
         {
@@ -189,7 +190,7 @@ public class OrderService : IOrderService
             if (dish == null)
             {
                 var ex = new Exception();
-                ex.Data.Add(StatusCodes.Status404NotFound.ToString(),
+                ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
                     "Dish in Order not found"
                 );
                 throw ex;

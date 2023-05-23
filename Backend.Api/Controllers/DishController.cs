@@ -19,7 +19,9 @@ public class DishController : ControllerBase
     }
 
     [HttpGet]
-    [SwaggerOperation(Summary = "Get a list of dishes from restaurant")]
+    [SwaggerOperation(Summary =
+        "Get a list of dishes from a restaurant. Sorting: NameAsc, NameDesc, PriceAsc, PriceDesc, RatingAsc, RatingDesc. " +
+        "Categories: Wok, Pizza, Soup, Dessert, Drink")]
     public async Task<DishPagedListDto> GetDishList([FromQuery] GetDishListQuery dishListQuery)
     {
         return await _dishService.GetDishList(dishListQuery);
@@ -37,7 +39,7 @@ public class DishController : ControllerBase
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
     [Route("{id}/rating/check")]
-    [SwaggerOperation(Summary = "Check if user is able to set rating of the dish")]
+    [SwaggerOperation(Summary = "Check if user is able to set rating for the dish")]
     public async Task<bool> CheckDishRating(Guid id)
     {
         return await _dishService.CheckDishRating(id, Guid.Parse(User.Identity.Name));
@@ -47,7 +49,7 @@ public class DishController : ControllerBase
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
     [Route("{id}/rating")]
-    [SwaggerOperation(Summary = "Set a rating for a dish")]
+    [SwaggerOperation(Summary = "Rate dish")]
     public async Task SetDishRating(Guid id, [FromQuery] int rating)
     {
         await _dishService.SetDishRating(id, rating, Guid.Parse(User.Identity.Name));

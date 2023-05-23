@@ -12,6 +12,7 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<Cart> Carts { get; set; } = null!;
     public DbSet<Token> Tokens { get; set; } = null!;
     public DbSet<Restaurant> Restaurants { get; set; } = null!;
+    public DbSet<Menu> Menus { get; set; } = null!;
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -44,5 +45,7 @@ public sealed class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<Restaurant>().HasKey(x => x.Id);
         modelBuilder.Entity<Restaurant>().HasIndex(x => x.Name).IsUnique();
+
+        modelBuilder.Entity<Menu>().HasKey(x => x.Id);
     }
 }

@@ -61,7 +61,7 @@ public class DishService : IDishService
             return _mapper.Map<DishDto>(dishEntity);
 
         var ex = new Exception();
-        ex.Data.Add(StatusCodes.Status404NotFound.ToString(),
+        ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
             "Dish entity not found"
         );
         throw ex;
@@ -79,7 +79,7 @@ public class DishService : IDishService
     {
         CheckRating(rating);
         await CheckDishInDb(id);
-        if(!await IsDishOrdered(id, userId))
+        if (!await IsDishOrdered(id, userId))
         {
             var ex = new Exception();
             ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
@@ -87,6 +87,7 @@ public class DishService : IDishService
             );
             throw ex;
         }
+
         if (await CheckDishRating(id, userId))
         {
             _context.Ratings.Add(new Rating
@@ -102,7 +103,7 @@ public class DishService : IDishService
             var dishEntity = await _context.Dishes.FirstOrDefaultAsync(x => x.Id == id);
             var dishRatingList = await _context.Ratings.Where(x => x.DishId == id).ToListAsync();
             var sum = dishRatingList.Sum(r => r.RatingScore);
-            dishEntity!.Rating = (double) sum / dishRatingList.Count;
+            dishEntity!.Rating = (double)sum / dishRatingList.Count;
 
             await _context.SaveChangesAsync();
         }
@@ -121,7 +122,7 @@ public class DishService : IDishService
         if (await _context.Dishes.FirstOrDefaultAsync(x => x.Id == dishId) == null)
         {
             var ex = new Exception();
-            ex.Data.Add(StatusCodes.Status404NotFound.ToString(),
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
                 "Dish entity not found"
             );
             throw ex;
@@ -141,12 +142,12 @@ public class DishService : IDishService
     private async Task<bool> IsDishOrdered(Guid id, Guid userId)
     {
         var carts = await _context.Carts.Where(x => x.DishId == id
-        && x.UserId == userId && x.OrderId != null).ToListAsync();
-        
+                                                    && x.UserId == userId && x.OrderId != null).ToListAsync();
+
         foreach (var cart in carts)
         {
-            if (await _context.Orders.FirstOrDefaultAsync(x=>
-                    x.UserId == userId && x.Id == cart.OrderId && 
+            if (await _context.Orders.FirstOrDefaultAsync(x =>
+                    x.UserId == userId && x.Id == cart.OrderId &&
                     x.Status == OrderStatus.Delivered.ToString()) != null)
                 return true;
         }
@@ -174,6 +175,15 @@ public class DishService : IDishService
 
     private async Task<List<Dish>> GetDishesByDishListQuery(GetDishListQuery dishListQuery)
     {
+        var menus = await CheckAndGetMenus(dishListQuery.RestaurantMenus, dishListQuery.RestaurantId);
+
+        List<Dish> dishesFromMenus = new();
+        foreach (var dish in menus.SelectMany(menu =>
+                     menu.Dishes.Where(dish => dishesFromMenus.All(d => d.Id != dish.Id))))
+        {
+            dishesFromMenus.Add(dish);
+        }
+
         foreach (var category in dishListQuery.Categories)
         {
             if (category != DishCategory.Dessert.ToString()
@@ -193,26 +203,52 @@ public class DishService : IDishService
             if (category.IsNullOrEmpty())
             {
                 if (dishListQuery.Vegetarian == null)
-                    return await _context.Dishes.ToListAsync();
-                return await _context.Dishes.Where(x =>
-                    dishListQuery.Vegetarian == x.Vegetarian).ToListAsync();
+                    return dishesFromMenus;
+                return dishesFromMenus.Where(x =>
+                    dishListQuery.Vegetarian == x.Vegetarian).ToList();
             }
         }
 
         if (dishListQuery.Categories.IsNullOrEmpty())
         {
             if (dishListQuery.Vegetarian == null)
-                return await _context.Dishes.ToListAsync();
-            return await _context.Dishes.Where(x =>
-                dishListQuery.Vegetarian == x.Vegetarian).ToListAsync();
+                return dishesFromMenus;
+            return dishesFromMenus.Where(x =>
+                dishListQuery.Vegetarian == x.Vegetarian).ToList();
         }
 
         if (dishListQuery.Vegetarian == null)
-            return await _context.Dishes.Where(x =>
-                dishListQuery.Categories.Contains(x.Category)).ToListAsync();
-        return await _context.Dishes.Where(x =>
+            return dishesFromMenus.Where(x =>
+                dishListQuery.Categories.Contains(x.Category)).ToList();
+        return dishesFromMenus.Where(x =>
             dishListQuery.Categories.Contains(x.Category) &&
-            dishListQuery.Vegetarian == x.Vegetarian).ToListAsync();
+            dishListQuery.Vegetarian == x.Vegetarian).ToList();
+    }
+
+    private async Task<List<Menu>> CheckAndGetMenus(List<Guid> menus, Guid restaurantId)
+    {
+        var restaurant = await _context.Restaurants.FirstOrDefaultAsync(r => restaurantId == r.Id);
+        if (restaurant == null)
+        {
+            var ex = new Exception();
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+                $"Restaurant with id \"{restaurantId}\" was not found"
+            );
+            throw ex;
+        }
+
+        var menusFromDb = await _context.Menus.Where(r => restaurantId == r.Id).ToListAsync();
+        foreach (var id in menus)
+        {
+            if (menusFromDb.Any(m => m.Id == id)) continue;
+            var ex = new Exception();
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+                $"Menu with id \"{id}\" was not found in restaurant with id \"{restaurantId}\""
+            );
+            throw ex;
+        }
+
+        return menusFromDb;
     }
 
     // --------------------------------------------------------------
