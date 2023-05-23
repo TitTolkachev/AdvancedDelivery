@@ -21,7 +21,7 @@ public class CookController : ControllerBase
     }
 
     [HttpGet]
-    [Route("orders")]
+    [Route("orders/free")]
     [SwaggerOperation(Summary = "Get free orders")]
     public async Task<OrderPagedListDto> GetFreeOrders([FromQuery] GetOrdersCookListQuery query)
     {
@@ -29,7 +29,7 @@ public class CookController : ControllerBase
     }
 
     [HttpGet]
-    [Route("orders")]
+    [Route("orders/history")]
     [SwaggerOperation(Summary = "Get cooked orders")]
     public async Task<OrderPagedListDto> GetOrdersFromHistory([FromQuery] GetOrdersListQuery query)
     {
@@ -37,19 +37,11 @@ public class CookController : ControllerBase
     }
 
     [HttpPatch]
-    [Route("cooked/{orderId}")]
-    [SwaggerOperation(Summary = "Change order status to Cooked")]
-    public async Task SetOrderStatusCooked(Guid orderId)
-    {
-        await _cookService.SetOrderStatusCooked(orderId, Guid.Parse(User.Identity.Name));
-    }
-
-    [HttpPatch]
     [Route("packed/{orderId}")]
     [SwaggerOperation(Summary = "Change order status to Packed")]
     public async Task SetOrderStatusPacked(Guid orderId)
     {
-        await _cookService.SetOrderStatusPacked(orderId, Guid.Parse(User.Identity.Name));
+        await _cookService.SetOrderStatusPackaging(orderId, Guid.Parse(User.Identity.Name));
     }
 
     [HttpPost]

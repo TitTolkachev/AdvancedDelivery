@@ -10,12 +10,10 @@ namespace DeliveryBackend.Controllers;
 [Route("api/restaurant")]
 public class RestaurantController : ControllerBase
 {
-    private readonly IProducerService _producerService;
     private readonly IRestaurantService _restaurantService;
 
-    public RestaurantController(IProducerService producerService, IRestaurantService restaurantService)
+    public RestaurantController(IRestaurantService restaurantService)
     {
-        _producerService = producerService;
         _restaurantService = restaurantService;
     }
 
@@ -33,14 +31,4 @@ public class RestaurantController : ControllerBase
     {
         return await _restaurantService.GetRestaurant(restaurantId);
     }
-
-    // [HttpPost]
-    // [SwaggerOperation(Summary = "TEST FOR RABBIT_MQ")]
-    // public async Task<OkObjectResult> Test()
-    // {
-    //     // publish message  
-    //     _producerService.SendMessage("Hello everyone!");
-    //
-    //     return Ok(null);
-    // }
 }

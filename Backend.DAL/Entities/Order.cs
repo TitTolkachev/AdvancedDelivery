@@ -22,4 +22,10 @@ public class Order
     public Restaurant Restaurant { get; set; } = null!;
 
     public List<Cart> Carts { get; set; } = null!;
+
+    public Guid? CookId { get; set; }
+    [ForeignKey("CookId")] public Cook? Cook { get; set; }
+
+    public Guid? CourierId { get; set; }
+    [ForeignKey("CourierId")] public Courier? Courier { get; set; }
 }

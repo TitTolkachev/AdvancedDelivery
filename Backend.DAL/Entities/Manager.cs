@@ -1,8 +1,12 @@
-﻿namespace Backend.DAL.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Backend.DAL.Entities;
 
 public class Manager
 {
     public Guid Id { get; set; }
 
-    public Restaurant? Restaurant { get; set; }
+    public Guid RestaurantId { get; set; }
+
+    [ForeignKey("RestaurantId")] public Restaurant? Restaurant { get; set; }
 }

@@ -13,6 +13,9 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<Token> Tokens { get; set; } = null!;
     public DbSet<Restaurant> Restaurants { get; set; } = null!;
     public DbSet<Menu> Menus { get; set; } = null!;
+    public DbSet<Cook> Cooks { get; set; } = null!;
+    public DbSet<Courier> Courier { get; set; } = null!;
+    public DbSet<Manager> Manager { get; set; } = null!;
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -48,5 +51,11 @@ public sealed class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<Menu>().HasKey(x => x.Id);
         modelBuilder.Entity<Menu>().HasIndex(x => new { x.Name, x.RestaurantId }).IsUnique();
+
+        modelBuilder.Entity<Cook>().HasKey(x => x.Id);
+
+        modelBuilder.Entity<Courier>().HasKey(x => x.Id);
+
+        modelBuilder.Entity<Manager>().HasKey(x => x.Id);
     }
 }
