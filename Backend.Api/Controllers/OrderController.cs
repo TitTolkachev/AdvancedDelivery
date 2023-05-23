@@ -49,6 +49,15 @@ public class OrderController : ControllerBase
     [HttpPost]
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
+    [SwaggerOperation(Summary = "Creating the order from dishes in basket")]
+    public async Task RepeatOrder([FromBody] OrderRepeatDto orderRepeatDto)
+    {
+        await _orderService.RepeatOrder(Guid.Parse(User.Identity.Name), orderRepeatDto);
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Authorize(Policy = "ValidateToken")]
     [Route("{id}/status")]
     [SwaggerOperation(Summary = "Confirm order delivery")]
     public async Task ConfirmOrderDelivery(Guid id)

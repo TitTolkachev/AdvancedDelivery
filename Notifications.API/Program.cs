@@ -7,6 +7,7 @@ using Notifications.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// TODO(Убрать)
 // Controllers
 builder.Services.AddControllers();
 

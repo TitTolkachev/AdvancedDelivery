@@ -24,7 +24,7 @@ public class ConsumerService : IConsumerService, IDisposable
         _model = _connection.CreateModel();
         _model.QueueDeclare(_queueName, durable: true, exclusive: false, autoDelete: false);
         _model.ExchangeDeclare(configuration.GetSection("MqConfiguration:ExchangeName").Get<string>(),
-            ExchangeType.Fanout, durable: true, autoDelete: false);
+            ExchangeType.Direct, durable: true, autoDelete: false);
         _model.QueueBind(_queueName, configuration.GetSection("MqConfiguration:ExchangeName").Get<string>(),
             string.Empty);
     }
@@ -36,7 +36,7 @@ public class ConsumerService : IConsumerService, IDisposable
         {
             var body = ea.Body.ToArray();
             var text = Encoding.UTF8.GetString(body);
-            
+
             // TODO(Убрать)
             Console.WriteLine(text);
 

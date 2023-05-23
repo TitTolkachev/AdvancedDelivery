@@ -153,8 +153,6 @@ public class OrderService : IOrderService
             throw ex;
         }
 
-        // В бд всем товарам в корзине проставить, что теперь они в заказе,
-        // заодно посчитать стоимость
         var orderId = Guid.NewGuid();
         var newOrder = new Order
         {
@@ -177,19 +175,50 @@ public class OrderService : IOrderService
         await _context.SaveChangesAsync();
     }
 
-    private async Task CheckDishes(List<Cart> cartDishes, Guid restaurantId)
+    public async Task RepeatOrder(Guid userId, OrderRepeatDto orderRepeatDto)
     {
-        var menus = await _context.Menus.Where(m => m.Restaurant.Id == restaurantId).ToListAsync();
-
-        foreach (var cartDish in cartDishes)
+        if (orderRepeatDto.DeliveryTime - DateTime.Now < TimeSpan.FromMinutes(5) ||
+            orderRepeatDto.DeliveryTime - DateTime.Now > TimeSpan.FromHours(24))
         {
-            if (menus.Any(m => m.Dishes.Any(d => d.Id == cartDish.DishId))) continue;
             var ex = new Exception();
             ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
-                $"Dish with id \"{cartDish.DishId}\" can not be delivered from restaurant with id \"{restaurantId}\""
+                "Bad request, Delivery time range is 5m - 24h"
             );
             throw ex;
         }
+
+        var previousOrderCarts = await _context.Carts
+            .Where(x => x.UserId == userId && x.OrderId == orderRepeatDto.OrderId)
+            .ToListAsync();
+        if (previousOrderCarts.IsNullOrEmpty())
+        {
+            var ex = new Exception();
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+                "Dishes were not found"
+            );
+            throw ex;
+        }
+
+        var orderId = Guid.NewGuid();
+        var newOrder = new Order
+        {
+            Id = orderId,
+            Number = await _context.Orders.CountAsync() + 1,
+            DeliveryTime = orderRepeatDto.DeliveryTime,
+            OrderTime = DateTime.UtcNow,
+            Status = OrderStatus.Created.ToString(),
+            Price = 0,
+            Address = orderRepeatDto.Address,
+            UserId = userId
+        };
+
+        // Проверка, что все блюда из одного ресторана
+        await CheckDishes(previousOrderCarts, orderRepeatDto.RestaurantId);
+
+        await _context.Orders.AddAsync(newOrder);
+        await _context.SaveChangesAsync();
+        newOrder.Price = await RepeatOrderOperations(userId, orderId, previousOrderCarts);
+        await _context.SaveChangesAsync();
     }
 
     public async Task ConfirmOrderDelivery(Guid userId, Guid orderId)
@@ -241,5 +270,42 @@ public class OrderService : IOrderService
         await _context.SaveChangesAsync();
 
         return res;
+    }
+
+    private async Task<decimal> RepeatOrderOperations(Guid userId, Guid orderId, IEnumerable<Cart> previousOrderCarts)
+    {
+        decimal res = 0;
+
+        foreach (var cart in previousOrderCarts)
+        {
+            res += cart.Amount * (await _context.Dishes.FirstOrDefaultAsync(d => d.Id == cart.DishId))!.Price;
+            await _context.Carts.AddAsync(new Cart
+            {
+                Id = Guid.NewGuid(),
+                DishId = cart.DishId,
+                Amount = cart.Amount,
+                UserId = userId,
+                OrderId = orderId
+            });
+        }
+
+        await _context.SaveChangesAsync();
+
+        return res;
+    }
+
+    private async Task CheckDishes(List<Cart> cartDishes, Guid restaurantId)
+    {
+        var menus = await _context.Menus.Where(m => m.Restaurant.Id == restaurantId).ToListAsync();
+
+        foreach (var cartDish in cartDishes)
+        {
+            if (menus.Any(m => m.Dishes.Any(d => d.Id == cartDish.DishId))) continue;
+            var ex = new Exception();
+            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+                $"Dish with id \"{cartDish.DishId}\" can not be delivered from restaurant with id \"{restaurantId}\""
+            );
+            throw ex;
+        }
     }
 }
