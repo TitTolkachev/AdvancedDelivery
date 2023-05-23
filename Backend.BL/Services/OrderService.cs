@@ -105,7 +105,7 @@ public class OrderService : IOrderService
         }
     }
 
-    public async Task<List<OrderInfoDto>> GetOrders(Guid userId, GetOrdersListQuery query)
+    public async Task<OrderPagedListDto> GetOrders(Guid userId, GetOrdersListQuery query)
     {
         var orders = _context.Orders.Where(x =>
             x.UserId == userId &&
@@ -114,19 +114,32 @@ public class OrderService : IOrderService
             x.DeliveryTime <= (query.DateEnd ?? DateTime.MaxValue)
         );
 
-        if (orders == null || query.Page > (orders.Count() + PageSize - 1) / PageSize)
-        {
-            var ex = new Exception();
-            ex.Data.Add(StatusCodes.Status400BadRequest.ToString(), "Orders were not found");
-            throw ex;
-        }
-
         var selectedOrders = await orders
             .Skip((query.Page - 1) * PageSize)
             .Take(Range.EndAt(PageSize))
             .ToListAsync();
 
-        return _mapper.Map<List<OrderInfoDto>>(selectedOrders);
+        var pagination = new PageInfoModel
+        {
+            Size = selectedOrders.Count,
+            Count = (orders.Count() + PageSize - 1) / PageSize,
+            Current = query.Page
+        };
+
+        if (pagination.Current <= pagination.Count && pagination.Current > 0)
+        {
+            return new OrderPagedListDto
+            {
+                Orders = _mapper.Map<List<OrderInfoDto>>(selectedOrders),
+                Pagination = pagination
+            };
+        }
+
+        var ex = new Exception();
+        ex.Data.Add(StatusCodes.Status400BadRequest.ToString(),
+            "Invalid value for attribute page"
+        );
+        throw ex;
     }
 
     public async Task CreateOrder(Guid userId, OrderCreateDto orderCreateDto)

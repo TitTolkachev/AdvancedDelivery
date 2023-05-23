@@ -8,6 +8,8 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace DeliveryBackend.Controllers;
 
 [ApiController]
+[Authorize]
+[Authorize(Policy = "ValidateToken")]
 [Route("api/order")]
 public class OrderController : ControllerBase
 {
@@ -19,8 +21,6 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
-    [Authorize(Policy = "ValidateToken")]
     [Route("{id}")]
     [SwaggerOperation(Summary = "Get information about concrete order")]
     public async Task<OrderDto> GetOrderInfo(Guid id)
@@ -29,17 +29,13 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
-    [Authorize(Policy = "ValidateToken")]
     [SwaggerOperation(Summary = "Get a list of orders")]
-    public async Task<List<OrderInfoDto>> GetOrders([FromQuery] GetOrdersListQuery query)
+    public async Task<OrderPagedListDto> GetOrders([FromQuery] GetOrdersListQuery query)
     {
         return await _orderService.GetOrders(Guid.Parse(User.Identity.Name), query);
     }
 
     [HttpPost]
-    [Authorize]
-    [Authorize(Policy = "ValidateToken")]
     [SwaggerOperation(Summary = "Creating the order from dishes in basket")]
     public async Task CreateOrder([FromBody] OrderCreateDto orderCreateDto)
     {
@@ -47,8 +43,6 @@ public class OrderController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
-    [Authorize(Policy = "ValidateToken")]
     [SwaggerOperation(Summary = "Creating the order from dishes in basket")]
     public async Task RepeatOrder([FromBody] OrderRepeatDto orderRepeatDto)
     {
@@ -56,8 +50,6 @@ public class OrderController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
-    [Authorize(Policy = "ValidateToken")]
     [Route("{id}/status")]
     [SwaggerOperation(Summary = "Confirm order delivery")]
     public async Task ConfirmOrderDelivery(Guid id)
@@ -66,9 +58,7 @@ public class OrderController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
-    [Authorize(Policy = "ValidateToken")]
-    [Route("{id}/status")]
+    [Route("cancel/{id}")]
     [SwaggerOperation(Summary = "Cancel order")]
     public async Task CancelOrder(Guid id)
     {
