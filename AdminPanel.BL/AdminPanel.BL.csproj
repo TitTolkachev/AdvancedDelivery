@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AdminPanel.Common\AdminPanel.Common.csproj" />
+      <ProjectReference Include="..\Backend.DAL\Backend.DAL.csproj" />
     </ItemGroup>
 
     <ItemGroup>

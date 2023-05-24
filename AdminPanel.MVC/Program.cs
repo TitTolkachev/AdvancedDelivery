@@ -1,10 +1,21 @@
 using AdminPanel.BL.Services;
 using AdminPanel.Common.Interfaces;
+using Auth.DAL;
+using Backend.DAL;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Backend Db
+var connection = builder.Configuration.GetConnectionString("BackendConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connection));
+
+// Auth Db
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("AuthConnection")));
 
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 
@@ -14,7 +25,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

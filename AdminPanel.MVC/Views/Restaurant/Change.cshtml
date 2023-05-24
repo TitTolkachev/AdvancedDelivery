@@ -1,20 +1,12 @@
-﻿@model AdminPanel.Common.Models.Restaurant
+﻿@model AdminPanel.Common.Models.Restaurant.Restaurant
 
 <div class="mt-2" style="width:50%">
     <form asp-action="Change">
-        <input asp-for="Id" type="hidden" class="form-control">
-
         <h2>Edit Restaurant</h2>
         <div class="mb-3">
             <label asp-for="Name" class="form-label">Name</label>
             <input asp-for="Name" type="text" class="form-control">
             <span class="text-danger" asp-validation-for="Name"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Address" class="form-label">Email</label>
-            <input asp-for="Address" type="text" class="form-control">
-            <span class="text-danger" asp-validation-for="Address"></span>
         </div>
 
         @if (TempData["msg"] != null)

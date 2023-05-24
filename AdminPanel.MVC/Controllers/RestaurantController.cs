@@ -1,5 +1,5 @@
 ﻿using AdminPanel.Common.Interfaces;
-using AdminPanel.Common.Models;
+using AdminPanel.Common.Models.Restaurant;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdminPanel.MVC.Controllers;
@@ -21,7 +21,7 @@ public class RestaurantController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(Restaurant restaurant)
+    public async Task<IActionResult> Create(Restaurant restaurant)
     {
         if (!ModelState.IsValid)
         {
@@ -30,16 +30,52 @@ public class RestaurantController : Controller
 
         try
         {
-            // TODO(Добавить ресторан)
-            
+            await _restaurantService.CreateRestaurant(restaurant);
+
             TempData["msg"] = "Restaurant created successfully!";
             return RedirectToAction("Create");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             TempData["msg"] = "FAILED! Restaurant was not created!";
             return View();
         }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Change(Guid id, Restaurant restaurant)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View();
+        }
+
+        try
+        {
+            await _restaurantService.ChangeRestaurant(restaurant);
+
+            TempData["msg"] = "Restaurant changed successfully!";
+            return RedirectToAction("Index");
+        }
+        catch (Exception)
+        {
+            TempData["msg"] = "FAILED! Restaurant was not changed!";
+            return View();
+        }
+    }
+
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            await _restaurantService.DeleteRestaurant(id);
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
+
+        return RedirectToAction("Index");
     }
 
     public IActionResult Create()

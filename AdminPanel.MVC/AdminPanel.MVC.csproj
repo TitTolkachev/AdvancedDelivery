@@ -68,12 +68,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Models\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\AdminPanel.BL\AdminPanel.BL.csproj" />
       <ProjectReference Include="..\AdminPanel.Common\AdminPanel.Common.csproj" />
+      <ProjectReference Include="..\Auth.DAL\Auth.DAL.csproj" />
+      <ProjectReference Include="..\Backend.DAL\Backend.DAL.csproj" />
     </ItemGroup>
 
     <ItemGroup>
