@@ -31,7 +31,7 @@ public class ProfileService : IProfileService
             .Select(u => new User
             {
                 Id = u.Id,
-                UserName = u.UserName,
+                UserName = u.FullName,
                 Email = u.Email,
                 BirthDate = u.BirthDate ?? DateTime.UtcNow,
                 Gender = u.Gender == Gender.Male.ToString() ? Gender.Male : Gender.Female,
@@ -65,11 +65,12 @@ public class ProfileService : IProfileService
         userEntity.Email = user.Email;
         userEntity.PhoneNumber = user.PhoneNumber;
         userEntity.BirthDate = user.BirthDate.ToUniversalTime();
-        userEntity.UserName = user.UserName;
+        userEntity.UserName = user.Email;
+        userEntity.FullName = user.UserName;
         userEntity.Gender = user.Gender.ToString();
 
         var rolesClone = new List<Role>(user.Roles);
-        await ChangeUserRoles(userEntity, rolesClone, user.Address);
+        await ChangeUserRoles(userEntity, rolesClone, user.Address ?? "");
 
         if (user.Roles.Any(r => r.Name is Roles.Cook or Roles.Manager))
         {
@@ -87,7 +88,7 @@ public class ProfileService : IProfileService
             .Select(u => new User
             {
                 Id = u.Id,
-                UserName = u.UserName,
+                UserName = u.FullName,
                 Email = u.Email,
                 BirthDate = u.BirthDate ?? DateTime.UtcNow,
                 Gender = u.Gender == Gender.Male.ToString() ? Gender.Male : Gender.Female,
@@ -107,10 +108,10 @@ public class ProfileService : IProfileService
         var selectedRest = user.RestaurantIds.FirstOrDefault(r => r.Selected);
         user.RestaurantId = selectedRest?.Value;
 
-        // var customer = await _backendDbContext
-        //     .Users
-        //     .FirstOrDefaultAsync(c => c.Id == user.Id);
-        // user.Address = customer?.Address;
+        var customer = await _backendDbContext
+            .Users
+            .FirstOrDefaultAsync(c => c.Id == user.Id);
+        user.Address = customer?.Address;
 
         return user;
     }
@@ -140,13 +141,21 @@ public class ProfileService : IProfileService
     {
         var roles = await _authDbContext
             .Roles
+            .Where(r => r.Name != "Admin")
             .ToListAsync();
         var userRolesId = await _authDbContext
             .UserRoles
             .Where(role => role.UserId == userId)
             .ToListAsync();
 
-        return roles.Select(role => new Role { Id = role.Id, Selected = userRolesId.Any(r => r.RoleId == role.Id) })
+        return roles.Select(role => new Role
+            {
+                Id = role.Id,
+                Name = role.Name == Roles.Customer.ToString() ? Roles.Customer :
+                    role.Name == Roles.Courier.ToString() ? Roles.Courier :
+                    role.Name == Roles.Manager.ToString() ? Roles.Manager : Roles.Cook,
+                Selected = userRolesId.Any(r => r.RoleId == role.Id)
+            })
             .ToList();
     }
 
@@ -158,11 +167,18 @@ public class ProfileService : IProfileService
                 .Managers
                 .Include(m => m.User)
                 .FirstOrDefaultAsync(m => m.User == user);
-            _authDbContext.Managers.Remove(managerAuth);
+            if (managerAuth != null)
+            {
+                _authDbContext.Managers.Remove(managerAuth);
+            }
+
             var managerBack = await _backendDbContext
                 .Managers
                 .FirstOrDefaultAsync(m => m.Id == user.Manager.Id);
-            _backendDbContext.Managers.Remove(managerBack);
+            if (managerBack != null)
+            {
+                _backendDbContext.Managers.Remove(managerBack);
+            }
         }
 
         if (user.Courier != null)
@@ -171,11 +187,18 @@ public class ProfileService : IProfileService
                 .Couriers
                 .Include(c => c.User)
                 .FirstOrDefaultAsync(c => c.User == user);
-            _authDbContext.Couriers.Remove(courierAuth);
+            if (courierAuth != null)
+            {
+                _authDbContext.Couriers.Remove(courierAuth);
+            }
+
             var courierBack = await _backendDbContext
                 .Couriers
                 .FirstOrDefaultAsync(c => c.Id == user.Courier.Id);
-            _backendDbContext.Couriers.Remove(courierBack);
+            if (courierBack != null)
+            {
+                _backendDbContext.Couriers.Remove(courierBack);
+            }
         }
 
         if (user.Customer != null)
@@ -184,11 +207,18 @@ public class ProfileService : IProfileService
                 .Customers
                 .Include(c => c.User)
                 .FirstOrDefaultAsync(c => c.User == user);
-            _authDbContext.Customers.Remove(customerAuth);
+            if (customerAuth != null)
+            {
+                _authDbContext.Customers.Remove(customerAuth);
+            }
+
             var customerBack = await _backendDbContext
                 .Users
                 .FirstOrDefaultAsync(c => c.Id == user.Customer.Id);
-            _backendDbContext.Users.Remove(customerBack);
+            if (customerBack != null)
+            {
+                _backendDbContext.Users.Remove(customerBack);
+            }
         }
 
         if (user.Cook != null)
@@ -197,11 +227,18 @@ public class ProfileService : IProfileService
                 .Cooks
                 .Include(c => c.User)
                 .FirstOrDefaultAsync(c => c.User == user);
-            _authDbContext.Cooks.Remove(cookAuth);
+            if (cookAuth != null)
+            {
+                _authDbContext.Cooks.Remove(cookAuth);
+            }
+
             var cookBack = await _backendDbContext
                 .Cooks
                 .FirstOrDefaultAsync(c => c.Id == user.Cook.Id);
-            _backendDbContext.Cooks.Remove(cookBack);
+            if (cookBack != null)
+            {
+                _backendDbContext.Cooks.Remove(cookBack);
+            }
         }
 
         await _authDbContext.SaveChangesAsync();
@@ -278,7 +315,7 @@ public class ProfileService : IProfileService
                     case Roles.Customer:
                         var customerAuth = new Customer
                         {
-                            Id = new Guid(),
+                            Id = Guid.NewGuid(),
                             User = user,
                             Address = address
                         };
@@ -294,7 +331,7 @@ public class ProfileService : IProfileService
                     case Roles.Cook:
                         var cookAuth = new Cook
                         {
-                            Id = new Guid(),
+                            Id = Guid.NewGuid(),
                             User = user
                         };
                         await _authDbContext.Cooks.AddAsync(cookAuth);
@@ -308,8 +345,9 @@ public class ProfileService : IProfileService
                     case Roles.Courier:
                         var courierAuth = new Courier
                         {
-                            Id = new Guid(),
-                            User = user
+                            Id = Guid.NewGuid(),
+                            User = user,
+                            UserId = user.Id
                         };
                         await _authDbContext.Couriers.AddAsync(courierAuth);
                         var courierBack = new Backend.DAL.Entities.Courier
@@ -322,7 +360,8 @@ public class ProfileService : IProfileService
                     case Roles.Manager:
                         var managerAuth = new Manager
                         {
-                            Id = new Guid(),
+                            Id = Guid.NewGuid(),
+                            UserId = user.Id,
                             User = user
                         };
                         await _authDbContext.Managers.AddAsync(managerAuth);
@@ -346,6 +385,11 @@ public class ProfileService : IProfileService
         foreach (var role in prevRoles)
         {
             var appRole = await _authDbContext.Roles.FirstOrDefaultAsync(ar => ar.Id == role.RoleId);
+            if (appRole == null)
+            {
+                continue;
+            }
+
             var roleEnum = Enum.Parse(typeof(Roles), appRole.Name);
             switch (roleEnum)
             {
@@ -357,9 +401,17 @@ public class ProfileService : IProfileService
                     var cookBack = await _backendDbContext
                         .Cooks
                         .FirstOrDefaultAsync(cook => cook.Id == user.Id);
-                    _backendDbContext.Cooks.Remove(cookBack);
+                    if (cookBack != null)
+                    {
+                        _backendDbContext.Cooks.Remove(cookBack);
+                    }
+
                     await _userManager.RemoveFromRoleAsync(user, Roles.Cook.ToString());
-                    _authDbContext.Cooks.Remove(cookAuth);
+                    if (cookAuth != null)
+                    {
+                        _authDbContext.Cooks.Remove(cookAuth);
+                    }
+
                     break;
 
                 case Roles.Customer:
@@ -370,9 +422,17 @@ public class ProfileService : IProfileService
                     var customerBack = await _backendDbContext
                         .Users
                         .FirstOrDefaultAsync(customer => customer.Id == user.Id);
-                    _backendDbContext.Users.Remove(customerBack);
+                    if (customerBack != null)
+                    {
+                        _backendDbContext.Users.Remove(customerBack);
+                    }
+
                     await _userManager.RemoveFromRoleAsync(user, Roles.Customer.ToString());
-                    _authDbContext.Customers.Remove(customerAuth);
+                    if (customerAuth != null)
+                    {
+                        _authDbContext.Customers.Remove(customerAuth);
+                    }
+
                     break;
 
                 case Roles.Courier:
@@ -383,9 +443,17 @@ public class ProfileService : IProfileService
                     var courierBack = await _backendDbContext
                         .Couriers
                         .FirstOrDefaultAsync(courier => courier.Id == user.Id);
-                    _backendDbContext.Couriers.Remove(courierBack);
+                    if (courierBack != null)
+                    {
+                        _backendDbContext.Couriers.Remove(courierBack);
+                    }
+
                     await _userManager.RemoveFromRoleAsync(user, Roles.Courier.ToString());
-                    _authDbContext.Couriers.Remove(courierAuth);
+                    if (courierAuth != null)
+                    {
+                        _authDbContext.Couriers.Remove(courierAuth);
+                    }
+
                     break;
 
                 case Roles.Manager:
@@ -396,9 +464,17 @@ public class ProfileService : IProfileService
                     var managerBack = await _backendDbContext
                         .Managers
                         .FirstOrDefaultAsync(manager => manager.Id == user.Id);
-                    _backendDbContext.Managers.Remove(managerBack);
+                    if (managerBack != null)
+                    {
+                        _backendDbContext.Managers.Remove(managerBack);
+                    }
+
                     await _userManager.RemoveFromRoleAsync(user, Roles.Manager.ToString());
-                    _authDbContext.Managers.Remove(managerAuth);
+                    if (managerAuth != null)
+                    {
+                        _authDbContext.Managers.Remove(managerAuth);
+                    }
+
                     break;
             }
 
@@ -417,7 +493,10 @@ public class ProfileService : IProfileService
             var manager = await _backendDbContext
                 .Managers
                 .FirstOrDefaultAsync(m => m.Id == editUser.Id);
-            manager.Restaurant = restaurant;
+            if (manager != null)
+            {
+                manager.Restaurant = restaurant;
+            }
         }
 
         if (editUser.Roles.Any(r => r is { Name: Roles.Cook, Selected: true }))
@@ -425,7 +504,10 @@ public class ProfileService : IProfileService
             var cook = await _backendDbContext
                 .Cooks
                 .FirstOrDefaultAsync(c => c.Id == editUser.Id);
-            cook.Restaurant = restaurant;
+            if (cook != null)
+            {
+                cook.Restaurant = restaurant;
+            }
         }
 
         await _backendDbContext.SaveChangesAsync();
