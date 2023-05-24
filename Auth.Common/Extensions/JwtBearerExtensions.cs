@@ -12,7 +12,7 @@ namespace Auth.Common.Extensions;
 
 public static class JwtBearerExtensions
 {
-    public static List<Claim> CreateClaims(this ApplicationUser user, List<IdentityRole<long>> roles)
+    public static List<Claim> CreateClaims(this ApplicationUser user, List<IdentityRole<Guid>> roles)
     {
         var claims = new List<Claim>
         {

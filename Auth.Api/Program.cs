@@ -57,7 +57,7 @@ builder.Services.AddAuthorization(options => options.DefaultPolicy =
         .RequireAuthenticatedUser()
         .Build());
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<long>>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddUserManager<UserManager<ApplicationUser>>()
     .AddSignInManager<SignInManager<ApplicationUser>>();

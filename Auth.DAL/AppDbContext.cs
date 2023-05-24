@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auth.DAL;
 
-public sealed class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<long>, long>
+public sealed class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
     public DbSet<Customer> Customers { get; set; } = null!;
     public DbSet<Manager> Managers { get; set; } = null!;

@@ -1,5 +1,5 @@
 ﻿using AdminPanel.Common.Interfaces;
-using AdminPanel.Common.Models.Restaurant;
+using AdminPanel.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdminPanel.MVC.Controllers;

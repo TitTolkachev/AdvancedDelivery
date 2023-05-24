@@ -1,1 +1,28 @@
-﻿<p>Users</p>
+﻿@model IEnumerable<AdminPanel.Common.Models.User>
+
+<div class="d-flex flex-column">
+    <h2 class="align-self-start pb-2">Users</h2>
+    @foreach (var user in Model)
+    {
+        <div class="d-flex flex-row justify-content-between align-items-center border bg-light rounded w-100">
+            <div class="p-3">
+                <div>Name: <b>@user.UserName</b></div>
+                <div>Email: @user.Email</div>
+                <div>Gender: @user.Gender</div>
+                <div>Phone: @user.PhoneNumber</div>
+                <div>BirthDate: @user.BirthDate.ToShortDateString()</div>
+                <div class="d-flex flex-row">
+                    Roles:\
+                    @foreach (var role in user.Roles.Where(role => role.Selected))
+                    {
+                        <div>@role.Name\</div>
+                    }
+                </div>
+            </div>
+            <div>
+                <a asp-controller="Profile" asp-action="Change" asp-route-Id="@user.Id.ToString()" class="btn btn-success m-1">Edit</a>
+                <a asp-controller="Profile" asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger m-1 me-3">Delete</a>
+            </div>
+        </div>
+    }
+</div>

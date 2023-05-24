@@ -67,16 +67,20 @@ public class DishService : IDishService
         throw ex;
     }
 
-    public async Task<bool> CheckDishRating(Guid id, Guid userId)
+    public async Task<bool> CheckDishRating(UserInfoDto userInfoDto, Guid id, Guid userId)
     {
+        await InitUser(userInfoDto);
+
         await CheckDishInDb(id);
 
         var ratingEntity = await _context.Ratings.FirstOrDefaultAsync(x => x.DishId == id && x.UserId == userId);
         return ratingEntity == null && await IsDishOrdered(id, userId);
     }
 
-    public async Task SetDishRating(Guid id, int rating, Guid userId)
+    public async Task SetDishRating(UserInfoDto userInfoDto, Guid id, int rating, Guid userId)
     {
+        await InitUser(userInfoDto);
+
         CheckRating(rating);
         await CheckDishInDb(id);
         if (!await IsDishOrdered(id, userId))
@@ -88,7 +92,7 @@ public class DishService : IDishService
             throw ex;
         }
 
-        if (await CheckDishRating(id, userId))
+        if (await CheckDishRating(userInfoDto, id, userId))
         {
             _context.Ratings.Add(new Rating
             {
@@ -249,6 +253,27 @@ public class DishService : IDishService
         }
 
         return menusFromDb;
+    }
+
+    private async Task InitUser(UserInfoDto userInfoDto)
+    {
+        var customer = await _context
+            .Users
+            .FirstOrDefaultAsync(c => c.Id == userInfoDto.id);
+        if (customer == null)
+        {
+            var newCustomer = new User
+            {
+                Id = userInfoDto.id,
+                Address = userInfoDto.address
+            };
+
+            await _context.Users.AddAsync(newCustomer);
+            await _context.SaveChangesAsync();
+            customer = newCustomer;
+        }
+
+        customer.Address = userInfoDto.address ?? customer.Address;
     }
 
     // --------------------------------------------------------------

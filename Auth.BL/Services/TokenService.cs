@@ -16,7 +16,7 @@ public class TokenService : ITokenService
         _configuration = configuration;
     }
 
-    public string CreateToken(ApplicationUser user, List<IdentityRole<long>> roles)
+    public string CreateToken(ApplicationUser user, List<IdentityRole<Guid>> roles)
     {
         var token = user
             .CreateClaims(roles)

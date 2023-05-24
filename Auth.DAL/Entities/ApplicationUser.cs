@@ -2,7 +2,7 @@
 
 namespace Auth.DAL.Entities;
 
-public class ApplicationUser : IdentityUser<long>
+public class ApplicationUser : IdentityUser<Guid>
 {
     public string FullName { get; set; } = null!;
     public DateTime? BirthDate { get; set; }

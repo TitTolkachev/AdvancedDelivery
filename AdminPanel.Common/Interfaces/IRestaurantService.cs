@@ -1,4 +1,4 @@
-﻿using AdminPanel.Common.Models.Restaurant;
+﻿using AdminPanel.Common.Models;
 
 namespace AdminPanel.Common.Interfaces;
 

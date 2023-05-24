@@ -16,8 +16,10 @@ public class BasketService : IBasketService
         _context = context;
     }
 
-    public async Task<List<DishBasketDto>> GetUserCart(Guid userId)
+    public async Task<List<DishBasketDto>> GetUserCart(UserInfoDto userInfoDto, Guid userId)
     {
+        await InitUser(userInfoDto);
+
         var dishList = await _context.Carts.Where(x => x.UserId == userId && x.OrderId == null).Join(
                 _context.Dishes,
                 c => c.DishId,
@@ -37,8 +39,10 @@ public class BasketService : IBasketService
         return dishList;
     }
 
-    public async Task AddDishToCart(Guid dishId, Guid userId)
+    public async Task AddDishToCart(UserInfoDto userInfoDto, Guid dishId, Guid userId)
     {
+        await InitUser(userInfoDto);
+
         if (await _context.Dishes.FirstOrDefaultAsync(x => x.Id == dishId) == null)
         {
             var ex = new Exception();
@@ -47,9 +51,10 @@ public class BasketService : IBasketService
             );
             throw ex;
         }
-        
+
         var dishCartEntity =
-            await _context.Carts.Where(x => x.UserId == userId && x.DishId == dishId && x.OrderId == null).FirstOrDefaultAsync();
+            await _context.Carts.Where(x => x.UserId == userId && x.DishId == dishId && x.OrderId == null)
+                .FirstOrDefaultAsync();
 
         if (dishCartEntity == null)
         {
@@ -70,8 +75,10 @@ public class BasketService : IBasketService
         }
     }
 
-    public async Task RemoveDishFromCart(Guid dishId, Guid userId)
+    public async Task RemoveDishFromCart(UserInfoDto userInfoDto, Guid dishId, Guid userId)
     {
+        await InitUser(userInfoDto);
+
         if (await _context.Dishes.FirstOrDefaultAsync(x => x.Id == dishId) == null)
         {
             var ex = new Exception();
@@ -80,9 +87,10 @@ public class BasketService : IBasketService
             );
             throw ex;
         }
-        
+
         var dishCartEntity =
-            await _context.Carts.Where(x => x.UserId == userId && x.DishId == dishId && x.OrderId == null).FirstOrDefaultAsync();
+            await _context.Carts.Where(x => x.UserId == userId && x.DishId == dishId && x.OrderId == null)
+                .FirstOrDefaultAsync();
 
         if (dishCartEntity == null)
         {
@@ -97,5 +105,26 @@ public class BasketService : IBasketService
         if (dishCartEntity.Amount == 0)
             _context.Carts.Remove(dishCartEntity);
         await _context.SaveChangesAsync();
+    }
+
+    private async Task InitUser(UserInfoDto userInfoDto)
+    {
+        var customer = await _context
+            .Users
+            .FirstOrDefaultAsync(c => c.Id == userInfoDto.id);
+        if (customer == null)
+        {
+            var newCustomer = new User
+            {
+                Id = userInfoDto.id,
+                Address = userInfoDto.address
+            };
+
+            await _context.Users.AddAsync(newCustomer);
+            await _context.SaveChangesAsync();
+            customer = newCustomer;
+        }
+
+        customer.Address = userInfoDto.address ?? customer.Address;
     }
 }

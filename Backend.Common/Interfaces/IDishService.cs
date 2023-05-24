@@ -7,9 +7,9 @@ public interface IDishService
 {
     Task<DishPagedListDto> GetDishList(GetDishListQuery dishListQuery);
     Task<DishDto> GetDish(Guid dishId);
-    Task<bool> CheckDishRating(Guid id, Guid userId);
-    Task SetDishRating(Guid id, int rating, Guid userId);
-    
+    Task<bool> CheckDishRating(UserInfoDto userInfoDto, Guid id, Guid userId);
+    Task SetDishRating(UserInfoDto userInfoDto, Guid id, int rating, Guid userId);
+
     // --------------------
     // --------------------
     Task AddDishes(List<DishDto> dishes);

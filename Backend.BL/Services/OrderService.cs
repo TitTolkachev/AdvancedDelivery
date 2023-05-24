@@ -24,8 +24,10 @@ public class OrderService : IOrderService
         _mapper = mapper;
     }
 
-    public async Task<OrderDto> GetOrderInfo(Guid userId, Guid orderId)
+    public async Task<OrderDto> GetOrderInfo(UserInfoDto userInfoDto, Guid userId, Guid orderId)
     {
+        await InitUser(userInfoDto);
+        
         var orderInfo = await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
         if (orderInfo == null)
         {
@@ -105,8 +107,10 @@ public class OrderService : IOrderService
         }
     }
 
-    public async Task<OrderPagedListDto> GetOrders(Guid userId, GetOrdersListQuery query)
+    public async Task<OrderPagedListDto> GetOrders(UserInfoDto userInfoDto, Guid userId, GetOrdersListQuery query)
     {
+        await InitUser(userInfoDto);
+        
         var orders = _context.Orders.Where(x =>
             x.UserId == userId &&
             x.Number.ToString().Contains(query.SearchOrderNumber ?? string.Empty) &&
@@ -142,8 +146,10 @@ public class OrderService : IOrderService
         throw ex;
     }
 
-    public async Task CreateOrder(Guid userId, OrderCreateDto orderCreateDto)
+    public async Task CreateOrder(UserInfoDto userInfoDto, Guid userId, OrderCreateDto orderCreateDto)
     {
+        await InitUser(userInfoDto);
+        
         if (orderCreateDto.DeliveryTime - DateTime.Now < TimeSpan.FromMinutes(5) ||
             orderCreateDto.DeliveryTime - DateTime.Now > TimeSpan.FromHours(24))
         {
@@ -188,8 +194,10 @@ public class OrderService : IOrderService
         await _context.SaveChangesAsync();
     }
 
-    public async Task RepeatOrder(Guid userId, OrderRepeatDto orderRepeatDto)
+    public async Task RepeatOrder(UserInfoDto userInfoDto, Guid userId, OrderRepeatDto orderRepeatDto)
     {
+        await InitUser(userInfoDto);
+        
         if (orderRepeatDto.DeliveryTime - DateTime.Now < TimeSpan.FromMinutes(5) ||
             orderRepeatDto.DeliveryTime - DateTime.Now > TimeSpan.FromHours(24))
         {
@@ -234,8 +242,10 @@ public class OrderService : IOrderService
         await _context.SaveChangesAsync();
     }
 
-    public async Task ConfirmOrderDelivery(Guid userId, Guid orderId)
+    public async Task ConfirmOrderDelivery(UserInfoDto userInfoDto, Guid userId, Guid orderId)
     {
+        await InitUser(userInfoDto);
+        
         var order = await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
 
         if (order == null)
@@ -320,5 +330,26 @@ public class OrderService : IOrderService
             );
             throw ex;
         }
+    }
+
+    private async Task InitUser(UserInfoDto userInfoDto)
+    {
+        var customer = await _context
+            .Users
+            .FirstOrDefaultAsync(c => c.Id == userInfoDto.id);
+        if (customer == null)
+        {
+            var newCustomer = new User
+            {
+                Id = userInfoDto.id,
+                Address = userInfoDto.address
+            };
+
+            await _context.Users.AddAsync(newCustomer);
+            await _context.SaveChangesAsync();
+            customer = newCustomer;
+        }
+
+        customer.Address = userInfoDto.address ?? customer.Address;
     }
 }

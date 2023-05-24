@@ -9,11 +9,11 @@ public class DbInitializer : IDbInitializer
 {
     private readonly AppDbContext _context;
 
-    private readonly RoleManager<IdentityRole<long>> _roleManager;
+    private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IConfiguration _configuration;
 
-    public DbInitializer(AppDbContext context, RoleManager<IdentityRole<long>> roleManager,
+    public DbInitializer(AppDbContext context, RoleManager<IdentityRole<Guid>> roleManager,
         UserManager<ApplicationUser> userManager, IConfiguration configuration)
     {
         _context = context;
@@ -38,11 +38,11 @@ public class DbInitializer : IDbInitializer
 
         if (_roleManager.RoleExistsAsync("Customer").GetAwaiter().GetResult()) return;
 
-        _roleManager.CreateAsync(new IdentityRole<long>("Customer")).GetAwaiter().GetResult();
-        _roleManager.CreateAsync(new IdentityRole<long>("Courier")).GetAwaiter().GetResult();
-        _roleManager.CreateAsync(new IdentityRole<long>("Manager")).GetAwaiter().GetResult();
-        _roleManager.CreateAsync(new IdentityRole<long>("Cook")).GetAwaiter().GetResult();
-        _roleManager.CreateAsync(new IdentityRole<long>("Admin")).GetAwaiter().GetResult();
+        _roleManager.CreateAsync(new IdentityRole<Guid>("Customer")).GetAwaiter().GetResult();
+        _roleManager.CreateAsync(new IdentityRole<Guid>("Courier")).GetAwaiter().GetResult();
+        _roleManager.CreateAsync(new IdentityRole<Guid>("Manager")).GetAwaiter().GetResult();
+        _roleManager.CreateAsync(new IdentityRole<Guid>("Cook")).GetAwaiter().GetResult();
+        _roleManager.CreateAsync(new IdentityRole<Guid>("Admin")).GetAwaiter().GetResult();
 
         _userManager.CreateAsync(new ApplicationUser
         {
@@ -51,7 +51,7 @@ public class DbInitializer : IDbInitializer
             Email = _configuration.GetSection("Admin:Email").Get<string>(),
             EmailConfirmed = true
         }, _configuration.GetSection("Admin:Password").Get<string>()).GetAwaiter().GetResult();
-
+        
         var user =
             _context.Users.FirstOrDefault(u => u.Email == _configuration.GetSection("Admin:Email").Get<string>());
         if (user != null) _userManager.AddToRoleAsync(user, "Admin").GetAwaiter().GetResult();

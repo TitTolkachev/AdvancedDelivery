@@ -9,6 +9,6 @@ public class Customer
 
     public string? Address { get; set; }
 
-    [Required] public long UserId { get; set; }
+    [Required] public Guid UserId { get; set; }
     [Required] [ForeignKey("UserId")] public ApplicationUser User { get; set; } = null!;
 }

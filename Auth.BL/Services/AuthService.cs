@@ -60,7 +60,8 @@ public class AuthService : IAuthService
             throw ex;
         }
 
-        var roleIds = await _context.UserRoles.Where(r => r.UserId == user.Id).Select(x => x.RoleId).ToListAsync();
+        var roleIds = await _context.UserRoles.Where(r => r.UserId == user.Id).Select(x => x.RoleId)
+            .ToListAsync();
         var roles = _context.Roles.Where(x => roleIds.Contains(x.Id)).ToList();
 
         var accessToken = _tokenService.CreateToken(user, roles);

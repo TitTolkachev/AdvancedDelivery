@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AdminPanel.Common.Models.Restaurant;
+namespace AdminPanel.Common.Models;
 
 public class Restaurant
 {

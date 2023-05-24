@@ -1,5 +1,5 @@
 ﻿using AdminPanel.Common.Interfaces;
-using AdminPanel.Common.Models.Restaurant;
+using AdminPanel.Common.Models;
 using Backend.DAL;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;

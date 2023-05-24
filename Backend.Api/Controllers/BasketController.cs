@@ -1,4 +1,5 @@
-﻿using Backend.Common.Dto;
+﻿using System.Security.Claims;
+using Backend.Common.Dto;
 using Backend.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +24,7 @@ public class BasketController : ControllerBase
     [SwaggerOperation(Summary = "Get user cart")]
     public async Task<List<DishBasketDto>> GetUserCart()
     {
-        return await _basketService.GetUserCart(Guid.Parse(User.Identity.Name));
+        return await _basketService.GetUserCart(GetInfo(HttpContext.User), Guid.Parse(User.Identity.Name));
     }
 
     [HttpPost]
@@ -33,7 +34,7 @@ public class BasketController : ControllerBase
     [SwaggerOperation(Summary = "Add dish to cart")]
     public async Task AddDishToCart(Guid dishId)
     {
-        await _basketService.AddDishToCart(dishId, Guid.Parse(User.Identity.Name));
+        await _basketService.AddDishToCart(GetInfo(HttpContext.User), dishId, Guid.Parse(User.Identity.Name));
     }
 
     [HttpDelete]
@@ -43,6 +44,19 @@ public class BasketController : ControllerBase
     [SwaggerOperation(Summary = "Decrease the number of dishes in the cart")]
     public async Task DecreaseDishQuantityInCart(Guid dishId)
     {
-        await _basketService.RemoveDishFromCart(dishId, Guid.Parse(User.Identity.Name));
+        await _basketService.RemoveDishFromCart(GetInfo(HttpContext.User), dishId, Guid.Parse(User.Identity.Name));
+    }
+
+    private UserInfoDto GetInfo(ClaimsPrincipal user)
+    {
+        var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userAddress = user.FindFirst("address")?.Value;
+        var userInfo = new UserInfoDto()
+        {
+            id = Guid.Parse(userId!),
+            address = userAddress
+        };
+
+        return userInfo;
     }
 }

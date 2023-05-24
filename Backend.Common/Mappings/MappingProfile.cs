@@ -10,7 +10,5 @@ public class MappingProfile : Profile
     {
         CreateMap<Order, OrderInfoDto>();
         CreateMap<Dish, DishDto>().ReverseMap();
-        CreateMap<UserRegisterModel, User>();
-        CreateMap<User, UserDto>();
     }
 }

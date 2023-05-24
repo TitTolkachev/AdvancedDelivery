@@ -5,5 +5,5 @@ namespace Auth.Common.Interfaces;
 
 public interface ITokenService
 {
-    string CreateToken(ApplicationUser user, List<IdentityRole<long>> role);
+    string CreateToken(ApplicationUser user, List<IdentityRole<Guid>> role);
 }

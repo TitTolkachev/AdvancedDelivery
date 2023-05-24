@@ -1,4 +1,5 @@
-﻿using Backend.Common.Dto;
+﻿using System.Security.Claims;
+using Backend.Common.Dto;
 using Backend.Common.Dto.Queries;
 using Backend.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -42,7 +43,7 @@ public class DishController : ControllerBase
     [SwaggerOperation(Summary = "Check if user is able to set rating for the dish")]
     public async Task<bool> CheckDishRating(Guid id)
     {
-        return await _dishService.CheckDishRating(id, Guid.Parse(User.Identity.Name));
+        return await _dishService.CheckDishRating(GetInfo(HttpContext.User), id, Guid.Parse(User.Identity.Name));
     }
 
     [HttpPost]
@@ -52,9 +53,21 @@ public class DishController : ControllerBase
     [SwaggerOperation(Summary = "Rate dish")]
     public async Task SetDishRating(Guid id, [FromQuery] int rating)
     {
-        await _dishService.SetDishRating(id, rating, Guid.Parse(User.Identity.Name));
+        await _dishService.SetDishRating(GetInfo(HttpContext.User), id, rating, Guid.Parse(User.Identity.Name));
     }
 
+    private UserInfoDto GetInfo(ClaimsPrincipal user)
+    {
+        var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userAddress = user.FindFirst("address")?.Value;
+        var userInfo = new UserInfoDto()
+        {
+            id = Guid.Parse(userId!),
+            address = userAddress
+        };
+
+        return userInfo;
+    }
 
     // TODO(Переделать)
     // --------------------
