@@ -1,16 +1,11 @@
 using AutoMapper;
 using Backend.BL.Services;
-using Backend.BL.Services.ValidateTokenPolicy;
 using Backend.Common.Interfaces;
 using Backend.Common.Mappings;
 using Backend.DAL;
 using Common.Configuration;
 using Common.Middleware.ExceptionHandler;
-using DeliveryBackend.Configurations;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
