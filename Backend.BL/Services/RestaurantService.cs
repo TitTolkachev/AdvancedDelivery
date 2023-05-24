@@ -42,7 +42,12 @@ public class RestaurantService : IRestaurantService
                 {
                     Id = r.Id,
                     Name = r.Name,
-                    Menus = r.Menus.Select(m => m.Id).ToList()
+                    Menus = new List<MenuDto>(r.Menus.Select(m => new MenuDto
+                    {
+                        Id = m.Id,
+                        Name = m.Name,
+                        Dishes = m.Dishes.Select(d => d.Id).ToList()
+                    }).ToList())
                 }).ToList();
 
         return new RestaurantPagedListDto
@@ -75,8 +80,13 @@ public class RestaurantService : IRestaurantService
         var restaurantDto = new RestaurantDto
         {
             Id = restaurant.Id,
-            Menus = restaurant.Menus.Select(m => m.Id).ToList(),
-            Name = restaurant.Name
+            Name = restaurant.Name,
+            Menus = new List<MenuDto>(restaurant.Menus.Select(m => new MenuDto
+            {
+                Id = m.Id,
+                Name = m.Name,
+                Dishes = m.Dishes.Select(d => d.Id).ToList()
+            }).ToList())
         };
 
         return restaurantDto;

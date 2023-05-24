@@ -50,6 +50,8 @@ builder.Services.AddScoped<IBasketService, BasketService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<ICookService, CookService>();
+builder.Services.AddScoped<IManagerService, ManagerService>();
+builder.Services.AddScoped<ICourierService, CourierService>();
 
 // Auth
 builder.Services.AddSingleton<IAuthorizationHandler, ValidateTokenRequirementHandler>();

@@ -14,8 +14,8 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<Restaurant> Restaurants { get; set; } = null!;
     public DbSet<Menu> Menus { get; set; } = null!;
     public DbSet<Cook> Cooks { get; set; } = null!;
-    public DbSet<Courier> Courier { get; set; } = null!;
-    public DbSet<Manager> Manager { get; set; } = null!;
+    public DbSet<Courier> Couriers { get; set; } = null!;
+    public DbSet<Manager> Managers { get; set; } = null!;   
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
