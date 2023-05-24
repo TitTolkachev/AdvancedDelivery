@@ -20,31 +20,28 @@ public class BasketController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    [Authorize(Policy = "ValidateToken")]
     [SwaggerOperation(Summary = "Get user cart")]
     public async Task<List<DishBasketDto>> GetUserCart()
     {
-        return await _basketService.GetUserCart(GetInfo(HttpContext.User), Guid.Parse(User.Identity.Name));
+        return await _basketService.GetUserCart(GetInfo(HttpContext.User), Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
     }
 
     [HttpPost]
     [Authorize]
-    [Authorize(Policy = "ValidateToken")]
     [Route("dish/{dishId}")]
     [SwaggerOperation(Summary = "Add dish to cart")]
     public async Task AddDishToCart(Guid dishId)
     {
-        await _basketService.AddDishToCart(GetInfo(HttpContext.User), dishId, Guid.Parse(User.Identity.Name));
+        await _basketService.AddDishToCart(GetInfo(HttpContext.User), dishId, Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
     }
 
     [HttpDelete]
     [Authorize]
-    [Authorize(Policy = "ValidateToken")]
     [Route("dish/{dishId}")]
     [SwaggerOperation(Summary = "Decrease the number of dishes in the cart")]
     public async Task DecreaseDishQuantityInCart(Guid dishId)
     {
-        await _basketService.RemoveDishFromCart(GetInfo(HttpContext.User), dishId, Guid.Parse(User.Identity.Name));
+        await _basketService.RemoveDishFromCart(GetInfo(HttpContext.User), dishId, Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
     }
 
     private UserInfoDto GetInfo(ClaimsPrincipal user)

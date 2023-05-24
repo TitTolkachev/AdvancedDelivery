@@ -1,4 +1,5 @@
-﻿using Backend.Common.Dto;
+﻿using System.Security.Claims;
+using Backend.Common.Dto;
 using Backend.Common.Dto.Queries;
 using Backend.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,6 @@ namespace DeliveryBackend.Controllers;
 
 [Authorize]
 [Authorize(Roles = "Manager")]
-[Authorize(Policy = "ValidateToken")]
 [Route("api/manager")]
 public class ManagerController : ControllerBase
 {
@@ -26,7 +26,7 @@ public class ManagerController : ControllerBase
         "Get restaurant orders. Sorting: CreateDateAsc, CreateDateDesc, CookedDateAsc, CookedDateDesc")]
     public async Task<OrderPagedListDto> GetOrders([FromQuery] GetOrdersManagerListQuery query)
     {
-        return await _managerService.GetOrders(query, Guid.Parse(User.Identity.Name));
+        return await _managerService.GetOrders(query, Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
     }
 
     [HttpPost]
@@ -39,7 +39,7 @@ public class ManagerController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await _managerService.CreateMenu(createMenuDto, Guid.Parse(User.Identity.Name));
+        await _managerService.CreateMenu(createMenuDto, Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
         return Ok();
     }
 
@@ -48,7 +48,8 @@ public class ManagerController : ControllerBase
     [SwaggerOperation(Summary = "Change menu")]
     public async Task ChangeMenu(Guid menuId, [FromBody] ChangeMenuDto changeMenuDto)
     {
-        await _managerService.ChangeMenu(menuId, changeMenuDto, Guid.Parse(User.Identity.Name));
+        await _managerService.ChangeMenu(menuId, changeMenuDto,
+            Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
     }
 
     [HttpDelete]
@@ -56,7 +57,7 @@ public class ManagerController : ControllerBase
     [SwaggerOperation(Summary = "Delete menu")]
     public async Task DeleteMenu(Guid menuId)
     {
-        await _managerService.DeleteMenu(menuId, Guid.Parse(User.Identity.Name));
+        await _managerService.DeleteMenu(menuId, Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
     }
 
     [HttpPost]
@@ -64,7 +65,8 @@ public class ManagerController : ControllerBase
     [SwaggerOperation(Summary = "Add dish to menu")]
     public async Task AddDishToMenu(Guid menuId, Guid dishId)
     {
-        await _managerService.AddDishToMenu(menuId, dishId, Guid.Parse(User.Identity.Name));
+        await _managerService.AddDishToMenu(menuId, dishId,
+            Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
     }
 
     [HttpDelete]
@@ -72,6 +74,7 @@ public class ManagerController : ControllerBase
     [SwaggerOperation(Summary = "Remove dish from menu")]
     public async Task RemoveDishMenu(Guid menuId, Guid dishId)
     {
-        await _managerService.RemoveDishFromMenu(menuId, dishId, Guid.Parse(User.Identity.Name));
+        await _managerService.RemoveDishFromMenu(menuId, dishId,
+            Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
     }
 }

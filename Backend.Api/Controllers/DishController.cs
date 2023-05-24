@@ -38,22 +38,20 @@ public class DishController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    [Authorize(Policy = "ValidateToken")]
     [Route("{id}/rating/check")]
     [SwaggerOperation(Summary = "Check if user is able to set rating for the dish")]
     public async Task<bool> CheckDishRating(Guid id)
     {
-        return await _dishService.CheckDishRating(GetInfo(HttpContext.User), id, Guid.Parse(User.Identity.Name));
+        return await _dishService.CheckDishRating(GetInfo(HttpContext.User), id, Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
     }
 
     [HttpPost]
     [Authorize]
-    [Authorize(Policy = "ValidateToken")]
     [Route("{id}/rating")]
     [SwaggerOperation(Summary = "Rate dish")]
     public async Task SetDishRating(Guid id, [FromQuery] int rating)
     {
-        await _dishService.SetDishRating(GetInfo(HttpContext.User), id, rating, Guid.Parse(User.Identity.Name));
+        await _dishService.SetDishRating(GetInfo(HttpContext.User), id, rating, Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
     }
 
     private UserInfoDto GetInfo(ClaimsPrincipal user)

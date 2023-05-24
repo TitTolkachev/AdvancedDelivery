@@ -10,7 +10,6 @@ namespace DeliveryBackend.Controllers;
 
 [ApiController]
 [Authorize]
-[Authorize(Policy = "ValidateToken")]
 [Route("api/order")]
 public class OrderController : ControllerBase
 {

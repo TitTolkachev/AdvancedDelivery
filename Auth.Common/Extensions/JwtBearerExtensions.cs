@@ -30,7 +30,7 @@ public static class JwtBearerExtensions
     {
         return new SigningCredentials(
             new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!)
+                Encoding.UTF8.GetBytes(configuration["JwtConfig:Key"]!)
             ),
             SecurityAlgorithms.HmacSha256
         );
@@ -38,11 +38,11 @@ public static class JwtBearerExtensions
 
     public static JwtSecurityToken CreateJwtToken(this IEnumerable<Claim> claims, IConfiguration configuration)
     {
-        var expire = configuration.GetSection("Jwt:Expire").Get<int>();
+        var expire = configuration.GetSection("JwtConfig:AccessMinutesLifeTime").Get<int>();
 
         return new JwtSecurityToken(
-            configuration["Jwt:Issuer"],
-            configuration["Jwt:Audience"],
+            configuration["JwtConfig:Issuer"],
+            configuration["JwtConfig:Audience"],
             claims,
             expires: DateTime.UtcNow.AddMinutes(expire),
             signingCredentials: configuration.CreateSigningCredentials()
@@ -51,12 +51,12 @@ public static class JwtBearerExtensions
 
     public static JwtSecurityToken CreateToken(this IConfiguration configuration, List<Claim> authClaims)
     {
-        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!));
-        var tokenValidityInMinutes = configuration.GetSection("Jwt:TokenValidityInMinutes").Get<int>();
+        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtConfig:Key"]!));
+        var tokenValidityInMinutes = configuration.GetSection("JwtConfig:AccessMinutesLifeTime").Get<int>();
 
         var token = new JwtSecurityToken(
-            issuer: configuration["Jwt:Issuer"],
-            audience: configuration["Jwt:Audience"],
+            issuer: configuration["JwtConfig:Issuer"],
+            audience: configuration["JwtConfig:Audience"],
             expires: DateTime.UtcNow.AddMinutes(tokenValidityInMinutes),
             claims: authClaims,
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
@@ -80,7 +80,7 @@ public static class JwtBearerExtensions
             ValidateAudience = false,
             ValidateIssuer = false,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtConfig:Key"]!)),
             ValidateLifetime = false
         };
 

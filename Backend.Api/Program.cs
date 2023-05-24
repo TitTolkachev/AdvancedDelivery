@@ -4,6 +4,7 @@ using Backend.BL.Services.ValidateTokenPolicy;
 using Backend.Common.Interfaces;
 using Backend.Common.Mappings;
 using Backend.DAL;
+using Common.Configuration;
 using Common.Middleware.ExceptionHandler;
 using DeliveryBackend.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -54,28 +55,30 @@ builder.Services.AddScoped<IManagerService, ManagerService>();
 builder.Services.AddScoped<ICourierService, CourierService>();
 
 // Auth
-builder.Services.AddSingleton<IAuthorizationHandler, ValidateTokenRequirementHandler>();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = JwtConfigurations.Issuer,
-            ValidateAudience = true,
-            ValidAudience = JwtConfigurations.Audience,
-            ValidateLifetime = true,
-            IssuerSigningKey = JwtConfigurations.GetSymmetricSecurityKey(),
-            ValidateIssuerSigningKey = true,
-        };
-    });
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy(
-        "ValidateToken",
-        policy => policy.Requirements.Add(new ValidateTokenRequirement()));
-});
+// builder.Services.AddSingleton<IAuthorizationHandler, ValidateTokenRequirementHandler>();
+// builder.Services.AddHttpContextAccessor();
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(options =>
+//     {
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidIssuer = JwtConfigurations.Issuer,
+//             ValidateAudience = true,
+//             ValidAudience = JwtConfigurations.Audience,
+//             ValidateLifetime = true,
+//             IssuerSigningKey = JwtConfigurations.GetSymmetricSecurityKey(),
+//             ValidateIssuerSigningKey = true,
+//         };
+//     });
+// builder.Services.AddAuthorization(options =>
+// {
+//     options.AddPolicy(
+//         "ValidateToken",
+//         policy => policy.Requirements.Add(new ValidateTokenRequirement()));
+// });
+
+builder.ConfigureJwt();
 
 // TODO(Перенести в Auth)
 // Quartz
