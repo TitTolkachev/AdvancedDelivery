@@ -22,7 +22,8 @@ public class CookController : ControllerBase
 
     [HttpGet]
     [Route("orders/free")]
-    [SwaggerOperation(Summary = "Get free orders")]
+    [SwaggerOperation(Summary =
+        "Get free orders. Sorting: CreateDateAsc, CreateDateDesc, CookedDateAsc, CookedDateDesc")]
     public async Task<OrderPagedListDto> GetFreeOrders([FromQuery] GetOrdersCookListQuery query)
     {
         return await _cookService.GetFreeOrders(query, Guid.Parse(User.Identity.Name));

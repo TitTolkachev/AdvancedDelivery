@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Backend.Common.Dto;
+using Backend.Common.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace DeliveryBackend.Controllers;
 
@@ -9,56 +12,42 @@ namespace DeliveryBackend.Controllers;
 [Route("api/courier")]
 public class CourierController : ControllerBase
 {
-    // private readonly IOrderService _orderService;
-    // private readonly ICourierService _courierService;
-    //
-    // public CourierController(IOrderService orderService, ICourierService courierService)
-    // {
-    //     _orderService = orderService;
-    //     _courierService = courierService;
-    // }
-    //
-    // /// <summary>
-    // /// Get list of courier's orders (current == true => taken, else => available)
-    // /// </summary>
-    // [HttpGet]
-    // [Route("orders")]
-    // public async Task<OrdersPageDto> GetCourierOrders([FromQuery] OrderQueryModel query)
-    // {
-    //     var courierInfo = GetCourierInfo(HttpContext.User);
-    //     return await _orderService.GetOrders(query, UserRole.Courier, courierInfo);
-    // }
-    //
-    // /// <summary>
-    // /// Change order status when delivered it
-    // /// </summary>
-    // [HttpPut]
-    // [Route("{orderId}")]
-    // public async Task SetOrderStatusDelivered(Guid orderId)
-    // {
-    //     var courierInfo = GetCourierInfo(HttpContext.User);
-    //     await _courierService.SetOrderDelivered(orderId, courierInfo);
-    // }
-    //
-    // /// <summary>
-    // /// Courier takes order
-    // /// </summary>
-    // [HttpPost]
-    // [Route("{orderId}")]
-    // public async Task TakeOrder(Guid orderId)
-    // {
-    //     var courierInfo = GetCourierInfo(HttpContext.User);
-    //     await _courierService.TakeOrder(orderId, courierInfo);
-    // }
-    //
-    // /// <summary>
-    // /// Courier takes order
-    // /// </summary>
-    // [HttpPost]
-    // [Route("cancel/{orderId}")]
-    // public async Task CancelOrder(Guid orderId)
-    // {
-    //     var courierInfo = GetCourierInfo(HttpContext.User);
-    //     await _courierService.CancelOrder(orderId, courierInfo);
-    // }
+    private readonly ICourierService _courierService;
+
+    public CourierController(ICourierService courierService)
+    {
+        _courierService = courierService;
+    }
+
+    [HttpGet]
+    [Route("orders")]
+    [SwaggerOperation(Summary = "Get orders")]
+    public async Task<List<OrderInfoDto>> GetOrders()
+    {
+        return await _courierService.GetOrders(Guid.Parse(User.Identity.Name));
+    }
+
+    [HttpPost]
+    [Route("{orderId}")]
+    [SwaggerOperation(Summary = "Take order")]
+    public async Task TakeOrder(Guid orderId)
+    {
+        await _courierService.TakeOrder(orderId, Guid.Parse(User.Identity.Name));
+    }
+
+    [HttpPatch]
+    [Route("{orderId}")]
+    [SwaggerOperation(Summary = "Change order status to delivered")]
+    public async Task SetOrderDelivered(Guid orderId)
+    {
+        await _courierService.SetOrderDelivered(orderId, Guid.Parse(User.Identity.Name));
+    }
+
+    [HttpPost]
+    [Route("cancel/{orderId}")]
+    [SwaggerOperation(Summary = "Cancel order")]
+    public async Task CancelOrder(Guid orderId)
+    {
+        await _courierService.CancelOrder(orderId, Guid.Parse(User.Identity.Name));
+    }
 }

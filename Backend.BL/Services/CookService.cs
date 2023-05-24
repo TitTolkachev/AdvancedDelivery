@@ -212,14 +212,14 @@ public class CookService : ICookService
         return cook;
     }
 
-    private void Notify(Order orderEntity)
+    private void Notify(Order order)
     {
         var message = new NotificationMessage
         {
-            OrderId = orderEntity.Id,
-            UserId = orderEntity.UserId,
+            OrderId = order.Id,
+            UserId = order.UserId,
             Status = NotificationStatus.New,
-            Text = $"You order number {orderEntity.Number} is in state: {orderEntity.Status}"
+            Text = $"You order number {order.Number} is in state: {order.Status}"
         };
 
         _producerService.SendMessage(message);

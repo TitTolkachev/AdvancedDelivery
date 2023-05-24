@@ -22,7 +22,8 @@ public class ManagerController : ControllerBase
 
     [HttpGet]
     [Route("orders")]
-    [SwaggerOperation(Summary = "Get restaurant orders")]
+    [SwaggerOperation(Summary =
+        "Get restaurant orders. Sorting: CreateDateAsc, CreateDateDesc, CookedDateAsc, CookedDateDesc")]
     public async Task<OrderPagedListDto> GetOrders([FromQuery] GetOrdersManagerListQuery query)
     {
         return await _managerService.GetOrders(query, Guid.Parse(User.Identity.Name));
